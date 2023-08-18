@@ -29,8 +29,10 @@ export class GridController {
                 }
             });
             document.getElementById('grid')?.addEventListener('dragend', () => {
-                console.log('dragend');
-                Grid.IS_CLICKING = false;
+                if (Grid.IS_CLICKING) {
+                    Grid.IS_CLICKING = false;
+                    this.recalculateSolution(nodes);
+                }
             });
             document.getElementById('grid')?.addEventListener('mouseup', () => {
                 if (Grid.IS_CLICKING) {
