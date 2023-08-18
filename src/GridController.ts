@@ -36,6 +36,11 @@ export class GridController {
         }
       });
 
+      document.getElementById('grid')?.addEventListener('dragend', () => {
+        console.log('dragend');
+        Grid.IS_CLICKING = false;
+      });
+
       document.getElementById('grid')?.addEventListener('mouseup', () => {
         if (Grid.IS_CLICKING) {
           this.recalculateSolution(nodes);

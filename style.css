@@ -83,3 +83,7 @@ button {
   max-width: 700px;
   margin: auto;
 }
+
+.direction-selected {
+  background-color: rgba(76, 207, 76, 0.658);
+}

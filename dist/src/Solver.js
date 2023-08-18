@@ -9,6 +9,9 @@ export class Solver {
     changeStrategy(strategy) {
         this.strategy = strategy;
     }
+    changeSearchComponent(componentType) {
+        this.strategy.changeSearchComponent(componentType);
+    }
     clear() {
         this.strategy.clear();
     }

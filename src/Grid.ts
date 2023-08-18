@@ -16,6 +16,7 @@ export class Grid {
   static GRID_WIDTH = 20;
   static GRID_HEIGHT = 20;
   static IS_CLICKING = false;
+  static CHOSEN_DIRECTION = '8D';
   static showVisitedNodes = false;
 
   private gridHTMLGenerator: GridGenerator;
@@ -59,6 +60,35 @@ export class Grid {
       Grid.GRID_WIDTH = Number((e.target as HTMLInputElement).value);
       this.generate();
       document.getElementById('grid-size-width-value')!.innerHTML = Grid.GRID_WIDTH.toString();
+    });
+
+    // Direction change
+    document.getElementById('btn-directional-4d')?.addEventListener('click', (e) => {
+      Grid.CHOSEN_DIRECTION = '4D';
+      document.querySelectorAll('.direction-selected')?.forEach((el) => el.classList.remove('direction-selected'));
+      (e.target as HTMLButtonElement).classList.add('direction-selected');
+      this.strategies = [
+        new DFSStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
+        new BFSStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
+        new DijkstraStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
+        new AStarStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
+      ];
+      this.solver.changeSearchComponent('4D');
+      this.gridController.recalculateSolution(this.nodes);
+    });
+
+    document.getElementById('btn-directional-8d')?.addEventListener('click', (e) => {
+      Grid.CHOSEN_DIRECTION = '8D';
+      document.querySelectorAll('.direction-selected')?.forEach((el) => el.classList.remove('direction-selected'));
+      (e.target as HTMLButtonElement).classList.add('direction-selected');
+      this.strategies = [
+        new DFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+        new BFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+        new DijkstraStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+        new AStarStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+      ];
+      this.solver.changeSearchComponent('8D');
+      this.gridController.recalculateSolution(this.nodes);
     });
 
     document.getElementById('btn-path-reinitialize')?.addEventListener('click', () => this.reinitialize());
