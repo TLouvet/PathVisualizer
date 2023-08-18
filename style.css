@@ -8,10 +8,6 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-.btn-container {
-  text-align: center;
-}
-
 button {
   cursor: pointer;
   height: 44px;

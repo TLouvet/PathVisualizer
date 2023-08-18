@@ -22,6 +22,8 @@
       erase the current grid</p>
     <p>Select the pathfinding Algorithm that you wish to see in action. You can change it anytime, it will recalculate
       the path</p>
+    <p>Select the number of directions to search. 4 directions search will check for Top, Bottom, Right and Left nodes.
+      8 directions will also add the diagonals.</p>
     <p>Place the start and end buttons on the grid to start the calculation. You can add walls to update the path. Use
       "Remove Placement" to remove a wall or start/end point</p>
   </section>
@@ -52,6 +54,12 @@
       <button id="btn-algo-astar">A*</button>
     </div>
 
+    <div>
+      <h2>Search -not implemented-</h2>
+      <button id="btn-directional-4d">4 directions</button>
+      <button id="btn-directional-8d" class="directional-selected">8 directions</button>
+    </div>
+
 
     <div id="gridUtils" class="btn-container">
       <h2>Actions</h2>
@@ -67,6 +75,7 @@
   <section id="grid-container">
   </section>
 
+  <h2>WIP - Algorithm explanation</h2>
   <section id="algo-explained-DFS" class="algo-explained-container">
     <div>
       <h2>How DFS works</h2>
