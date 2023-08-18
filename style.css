@@ -1,0 +1,89 @@
+body {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  row-gap: 30px;
+  margin: 10px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.btn-container {
+  text-align: center;
+}
+
+button {
+  cursor: pointer;
+  height: 44px;
+  border: 1px solid rgba(0, 0, 0, 0.192);
+  min-width: 60px;
+  padding: 0 20px;
+  background-color: transparent;
+
+  &:hover {
+    background-color: aliceblue;
+  }
+
+  &.algo-selected {
+    background-color: rgba(76, 207, 76, 0.658);
+  }
+
+  &.path-selected {
+    background-color: rgba(76, 207, 76, 0.658);
+  }
+}
+
+.row {
+  display: flex;
+}
+
+.square {
+  width: 1.5vw;
+  height: 1.5vw;
+  max-width: 30px;
+  max-height: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.192);
+}
+
+.square:not(.start):hover,
+.square:not(.end):hover {
+  background-color: rgba(224, 127, 224, 0.301);
+  cursor: pointer;
+}
+
+.path-none {
+  background-color: white;
+}
+
+.path-start {
+  background-color: rgba(68, 182, 68, 0.801);
+}
+
+.path-end {
+  background-color: rgba(214, 77, 77, 0.733);
+}
+
+.path-wall {
+  background-color: rgba(133, 130, 130, 0.726);
+}
+
+.path-solution {
+  background-color: rgba(211, 211, 94, 0.836);
+}
+
+.path-visited {
+  background-color: rgba(179, 179, 240, 0.74);
+}
+
+.options-container {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  row-gap: 30px;
+  column-gap: 50px;
+}
+
+.algo-explained-container {
+  max-width: 700px;
+  margin: auto;
+}

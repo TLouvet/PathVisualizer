@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script src="dist/src/index.js" type="module" defer></script>
+</head>
+
+<body>
+  <header>
+    <h1>Pathfinding Visualizer</h1>
+  </header>
+  <section>
+    <h2>How to</h2>
+    <p>Adjust the size of the grid with the parameters from the grid display options. Please note that changing the size
+      erase the current grid</p>
+    <p>Select the pathfinding Algorithm that you wish to see in action. You can change it anytime, it will recalculate
+      the path</p>
+    <p>Place the start and end buttons on the grid to start the calculation. You can add walls to update the path. Use
+      "Remove Placement" to remove a wall or start/end point</p>
+  </section>
+  <section class="options-container">
+    <div id='grid-options'>
+      <h2>Grid Display Options</h2>
+      <div>
+        <label for="grid-size-slider-height">Height</label>
+        <input type="range" min="5" max="50" value="20" step="1" id="grid-size-slider-height">
+        <span id="grid-size-height-value">20</span>
+      </div>
+      <div>
+        <label for="grid-size-slider-width">Width</label>
+        <input type="range" min="5" max="50" value="20" step="1" id="grid-size-slider-width">
+        <span id="grid-size-width-value">20</span>
+      </div>
+      <div>
+        <label for="btn-show-visited">Show nodes visited but not part of the solution </label>
+        <input type="checkbox" id="btn-show-visited">
+      </div>
+    </div>
+
+    <div id="algoSelection" class="btn-container">
+      <h2>Algorithm Selection</h2>
+      <button id="btn-algo-dfs" class="algo-selected">DFS</button>
+      <button id="btn-algo-bfs">BFS</button>
+      <button id="btn-algo-dijkstra">Dijkstra</button>
+      <button id="btn-algo-astar">A*</button>
+    </div>
+
+
+    <div id="gridUtils" class="btn-container">
+      <h2>Actions</h2>
+      <button id="btn-path-start">Place Start</button>
+      <button id="btn-path-end">Place End</button>
+      <button id="btn-path-wall">Place Wall</button>
+      <button id="btn-path-none">Remove placement</button>
+      <button id="btn-path-reinitialize">Reinit Grid</button>
+
+    </div>
+  </section>
+  <p>Execution time: <span id="exec-time"></span></p>
+  <section id="grid-container">
+  </section>
+
+  <section id="algo-explained-DFS" class="algo-explained-container">
+    <div>
+      <h2>How DFS works</h2>
+      <p>The Depth First Search (DFS) algorithm explores paths until either a solution is found or the path is blocked.
+        While there are various ways to implement this algorithm, the core logic remains consistent. Starting from the
+        current node, the algorithm examines available directions to determine which nodes it can visit. In the context
+        of a grid, nodes eligible for visitation are either empty or represent the end node. Notably, nodes that have
+        already been visited are not revisited.</p>
+
+      <p>In the implementation presented here, the algorithm prioritizes adjacent nodes based on their Manhattan
+        distance
+        to the target end node. This approach enhances performance compared to random selection, as it strategically
+        moves towards the goal with each step, resulting in a more deterministic and efficient solution.</p>
+
+      <p>An alternate approach involves exploring nodes in a predetermined order, such as Top, Right, Bottom, Left.
+        This also offers a deterministic outcome. In contrast, a non-deterministic approach would involve selecting
+        random adjacent nodes repeatedly until the end node is reached.</p>
+    </div>
+    <div>
+      <h3>Algorithm - Typescript</h3>
+      <p>Here is my implementation of the algorithm</p>
+      <pre>
+        <code>
+          dfs(start: GraphNode, end: GraphNode) {
+            if (start.node.id === end.node.id) {
+              this.path.display();
+              end.changeState(new PathEndState()); // we have overriden the end state during the search
+              return true;
+            }
+        
+            const adjacentNodes = this.searchComponent.getAdjacentNodes(start);
+            adjacentNodes.sort((a, b) => this.getManhattanDistance(a, end) - this.getManhattanDistance(b, end));
+            for (const node of adjacentNodes) {
+              node.changeState(new PathVisitedState());
+              this.path.push(node);
+              if (this.dfs(node, end)) {
+                return true;
+              }
+              this.path.pop();
+            }
+        
+            return false;
+          }
+        </code>
+      </pre>
+      <p>Assuming both a start and an end node are provided (with prior verification), the algorithm compares their IDs
+        to determine if they are the same. The utilization of a GraphNode structure, containing an HTML node, allows for
+        ID-based comparison. A match indicates the discovery of a viable path.</p>
+
+      <p>The 'path' class used in the code functions as a stack, recording the nodes that will be used as a solution.
+      </p>
+
+      <p>The loop is quite simple: Look at each node, push it in the stack and recursively traverse the graph. If the
+        node is part of the solution, then
+        the loop will stop at the if statement returning true inside of it. If not, the node is popped from the stack
+        and we get to the next node.</p>
+
+      <p>In the end, if none of the adjacent nodes was a viable node, we reject this solution (that will trigger a pop()
+        in the previous call)</p>
+
+    </div>
+    <div>
+      <h3>Pros and Cons</h3>
+      <p>Pros:</p>
+      <ul>
+        <li>Simple to implement</li>
+        <li>Efficient processing</li>
+      </ul>
+
+      <p>Cons:</p>
+      <ul>
+        <li>Does not guarantee the shortest path</li>
+        <li>May generate suboptimal paths in the presence of obstacles along the main route</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="algo-explained-BFS" class="algo-explained-container">
+    <h2>How BFS works</h2>
+    <p>The Breadth First Search Algorithm works very differently from the DFS. From a starting point, it will expand in
+      every possible direction until it finds the
+      end node. Once the node is found, it will backtrack to the start node and mark the path. This is done by giving
+      each node a parent. In BFS, the parent node to a given current node is
+      simply the node that discovered it.</p>
+
+    <p>Contrarily to the DFS algorithm which uses a Stack structure to traverse the grid, BFS uses a Queue structure,
+      which means the first node that enters is
+      also the first one to be explored (FIFO).
+    </p>
+
+    <div>
+      <h3>Pros - Cons</h3>
+      <p>Pros</p>
+      <ul>
+        <li>Easy to implement</li>
+        <li>Guarantees the shortest path</li>
+      </ul>
+
+      <p>Cons</p>
+      <ul>
+        <li>Might visit a ton of nodes and thus is not optimized</li>
+    </div>
+
+  </section>
+</body>
+
+</html>

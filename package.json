@@ -1,0 +1,17 @@
+{
+  "name": "Astar",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test:watch": "jest --watchAll",
+    "build": "tsc && node ./addExtension.js"
+  },
+  "dependencies": {
+    "@types/jest": "^29.5.3",
+    "jest": "^29.6.2",
+    "jest-environment-jsdom": "^29.6.2",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  }
+}
