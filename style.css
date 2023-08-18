@@ -87,3 +87,7 @@ button {
 .direction-selected {
   background-color: rgba(76, 207, 76, 0.658);
 }
+
+pre {
+  white-space: pre-wrap;
+}

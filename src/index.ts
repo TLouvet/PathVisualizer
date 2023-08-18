@@ -11,8 +11,6 @@ bootstrap();
 
 // State pour discovered ?
 
-// permettre à l'utilisateur de switch entre 4 et 8 directions
-
 // refactor les algo
 
 // Refactor la classe grid
