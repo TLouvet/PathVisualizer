@@ -19,3 +19,5 @@ bootstrap();
 // Refactor la classe grid
 
 // Distance classes à implémenter et intégrer dans les algo
+
+// Fill wall et fill void

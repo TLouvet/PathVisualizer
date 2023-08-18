@@ -62,16 +62,16 @@ export class Grid {
             document.getElementById(id)?.classList.add('algo-selected');
             switch (type) {
                 case ESearchStrategy.DFS:
-                    this.changeSolverStrategy(this.strategies[0]);
+                    this.changeSolverStrategy(new DFSStrategy(this.nodes));
                     break;
                 case ESearchStrategy.BFS:
-                    this.changeSolverStrategy(this.strategies[1]);
+                    this.changeSolverStrategy(new BFSStrategy(this.nodes));
                     break;
                 case ESearchStrategy.DIJKSTRA:
-                    this.changeSolverStrategy(this.strategies[2]);
+                    this.changeSolverStrategy(new DijkstraStrategy(this.nodes));
                     break;
                 case ESearchStrategy.ASTAR:
-                    this.changeSolverStrategy(this.strategies[3]);
+                    this.changeSolverStrategy(new AStarStrategy(this.nodes));
                     break;
                 default:
                     break;
