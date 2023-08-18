@@ -7,13 +7,9 @@ import { Solver } from './Solver.js';
 import { PathOption } from './PathOption.enum.js';
 import { DijkstraStrategy } from './SearchStrategies/DijkstraStrategy.js';
 import { AStarStrategy } from './SearchStrategies/AStarStrategy.js';
-import { Search8DirectionsComponent } from './SearchStrategies/component/Search8DirectionComponent.js';
-import { Search4DirectionComponent } from './SearchStrategies/component/Search4DirectionComponent.js';
+import { ESearchDirection, SearchDirectionSingleton } from './SearchDirectionSingleton.js';
 export class Grid {
-    static GRID_WIDTH = 20;
-    static GRID_HEIGHT = 20;
     static IS_CLICKING = false;
-    static CHOSEN_DIRECTION = '8D';
     static showVisitedNodes = false;
     gridHTMLGenerator;
     nodes;
@@ -30,10 +26,10 @@ export class Grid {
         this.initListeners('btn-algo-astar', ESearchStrategy.ASTAR);
         // Weird that i still have to redeclare it in the generate mthod...
         this.strategies = [
-            new DFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new BFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new DijkstraStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new AStarStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+            new DFSStrategy(this.nodes),
+            new BFSStrategy(this.nodes),
+            new DijkstraStrategy(this.nodes),
+            new AStarStrategy(this.nodes),
         ];
         this.solver = new Solver(this.strategies[0]);
         this.gridController = new GridController(this.solver);
@@ -42,41 +38,19 @@ export class Grid {
             Grid.showVisitedNodes = !Grid.showVisitedNodes;
             this.render();
         });
-        document.getElementById('grid-size-slider-height')?.addEventListener('input', (e) => {
-            Grid.GRID_HEIGHT = Number(e.target.value);
-            this.generate();
-            document.getElementById('grid-size-height-value').innerHTML = Grid.GRID_HEIGHT.toString();
-        });
-        document.getElementById('grid-size-slider-width')?.addEventListener('input', (e) => {
-            Grid.GRID_WIDTH = Number(e.target.value);
-            this.generate();
-            document.getElementById('grid-size-width-value').innerHTML = Grid.GRID_WIDTH.toString();
-        });
         // Direction change
         document.getElementById('btn-directional-4d')?.addEventListener('click', (e) => {
-            Grid.CHOSEN_DIRECTION = '4D';
+            SearchDirectionSingleton.searchDirection = ESearchDirection['4D'];
             document.querySelectorAll('.direction-selected')?.forEach((el) => el.classList.remove('direction-selected'));
             e.target.classList.add('direction-selected');
-            this.strategies = [
-                new DFSStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
-                new BFSStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
-                new DijkstraStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
-                new AStarStrategy(this.nodes, new Search4DirectionComponent(this.nodes)),
-            ];
-            this.solver.changeSearchComponent('4D');
+            this.solver.changeSearchComponent();
             this.gridController.recalculateSolution(this.nodes);
         });
         document.getElementById('btn-directional-8d')?.addEventListener('click', (e) => {
-            Grid.CHOSEN_DIRECTION = '8D';
+            SearchDirectionSingleton.searchDirection = ESearchDirection['8D'];
             document.querySelectorAll('.direction-selected')?.forEach((el) => el.classList.remove('direction-selected'));
             e.target.classList.add('direction-selected');
-            this.strategies = [
-                new DFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-                new BFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-                new DijkstraStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-                new AStarStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            ];
-            this.solver.changeSearchComponent('8D');
+            this.solver.changeSearchComponent();
             this.gridController.recalculateSolution(this.nodes);
         });
         document.getElementById('btn-path-reinitialize')?.addEventListener('click', () => this.reinitialize());
@@ -113,10 +87,10 @@ export class Grid {
         this.gridController.generateListeners(this.nodes);
         // Weird that i still have to redeclare it in the generate mthod...
         this.strategies = [
-            new DFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new BFSStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new DijkstraStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
-            new AStarStrategy(this.nodes, new Search8DirectionsComponent(this.nodes)),
+            new DFSStrategy(this.nodes),
+            new BFSStrategy(this.nodes),
+            new DijkstraStrategy(this.nodes),
+            new AStarStrategy(this.nodes),
         ];
         this.solver.changeStrategy(this.strategies[0]);
     }

@@ -1,5 +1,4 @@
 import { PathSolutionState } from '../GraphNode/State/PathSolutionState.js';
-// TODO -- il y a peut être besoin d'une interface ici et différentes impl de Path
 export class Path {
     isValid;
     nodes;

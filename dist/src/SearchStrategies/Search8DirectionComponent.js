@@ -1,4 +1,4 @@
-import { Grid } from '../Grid.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js';
+import { Grid } from '../Grid.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js.js';
 export class Search8DirectionsComponent {
     nodes;
     constructor(nodes) {

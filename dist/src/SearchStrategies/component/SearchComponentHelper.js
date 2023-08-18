@@ -1,4 +1,4 @@
-import { Grid } from '../../Grid.js';
+import { GridSizeSingleton } from '../../GridSizeSingleton.js';
 export class SearchComponentHelper {
     nodes;
     constructor(nodes) {
@@ -14,8 +14,12 @@ export class SearchComponentHelper {
         const node = this.getAdjacentNodeOrUndefined(col, row);
         return node;
     }
+    getGridSize() {
+        const { GRID_HEIGHT, GRID_WIDTH } = GridSizeSingleton;
+        return { GRID_HEIGHT, GRID_WIDTH };
+    }
     getAdjacentNodeOrUndefined(col, row) {
-        const index = row * Grid.GRID_WIDTH + col;
+        const index = row * GridSizeSingleton.GRID_WIDTH + col;
         if (index >= this.nodes.length) {
             return undefined;
         }

@@ -1,5 +1,5 @@
 import { GraphNode } from '../../GraphNode/GraphNode';
-import { Grid } from '../../Grid';
+import { GridSizeSingleton } from '../../GridSizeSingleton';
 
 export class SearchComponentHelper {
   constructor(private nodes: GraphNode[]) {}
@@ -17,8 +17,13 @@ export class SearchComponentHelper {
     return node;
   }
 
+  public getGridSize() {
+    const { GRID_HEIGHT, GRID_WIDTH } = GridSizeSingleton;
+    return { GRID_HEIGHT, GRID_WIDTH };
+  }
+
   private getAdjacentNodeOrUndefined(col: number, row: number) {
-    const index = row * Grid.GRID_WIDTH + col;
+    const index = row * GridSizeSingleton.GRID_WIDTH + col;
     if (index >= this.nodes.length) {
       return undefined;
     }

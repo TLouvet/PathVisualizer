@@ -1,8 +1,6 @@
 import { GraphNode } from '../GraphNode/GraphNode';
 import { PathSolutionState } from '../GraphNode/State/PathSolutionState';
 
-// TODO -- il y a peut être besoin d'une interface ici et différentes impl de Path
-
 export class Path {
   public isValid: boolean;
   public nodes: GraphNode[];

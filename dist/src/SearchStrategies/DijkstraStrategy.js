@@ -53,8 +53,3 @@ export class DijkstraStrategy extends AbstractSearchStrategy {
         return Math.sqrt(Math.pow(currentX - endX, 2) + Math.pow(currentY - endY, 2));
     }
 }
-// Take all of its valid adjacent nodes and give them a value of 1
-// Sort the most recent nodes by their local values
-// Take the first node and repeat the process until the end node is found
-// In this particular case, the algorithm might not perform better than a standard BFS
-// because the graph is not weighted. However, if the graph was weighted, then this algorithm would perform better

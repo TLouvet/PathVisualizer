@@ -11,8 +11,8 @@ export class Solver {
     this.strategy = strategy;
   }
 
-  changeSearchComponent(componentType: '4D' | '8D') {
-    this.strategy.changeSearchComponent(componentType);
+  changeSearchComponent() {
+    this.strategy.changeSearchComponent();
   }
 
   clear() {

@@ -25,7 +25,7 @@ export class DFSStrategy extends AbstractSearchStrategy {
             return true;
         }
         const adjacentNodes = this.searchComponent.getAdjacentNodes(start);
-        adjacentNodes.sort((a, b) => this.getManhattanDistance(a, end) - this.getManhattanDistance(b, end));
+        adjacentNodes.sort((a, b) => this.getEuclidianDistance(a, end) - this.getEuclidianDistance(b, end));
         for (const node of adjacentNodes) {
             node.changeState(new PathVisitedState());
             this.path.push(node);
@@ -40,5 +40,10 @@ export class DFSStrategy extends AbstractSearchStrategy {
         const [currentX, currentY] = currentNode.node.id.substring(1).split('-').map(Number);
         const [endX, endY] = endNode.node.id.substring(1).split('-').map(Number);
         return Math.abs(currentX - endX) + Math.abs(currentY - endY);
+    }
+    getEuclidianDistance(currentNode, endNode) {
+        const [currentX, currentY] = currentNode.node.id.substring(1).split('-').map(Number);
+        const [endX, endY] = endNode.node.id.substring(1).split('-').map(Number);
+        return Math.sqrt(Math.pow(currentX - endX, 2) + Math.pow(currentY - endY, 2));
     }
 }

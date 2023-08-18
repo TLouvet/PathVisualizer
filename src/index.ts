@@ -1,10 +1,13 @@
 import { Grid } from './Grid';
+import { GridSizeSingleton } from './GridSizeSingleton';
 import { PathSelectorSingleton } from './PathSelectorSingleton';
 
 function bootstrap() {
   PathSelectorSingleton.initListeners();
   const grid = new Grid();
   grid.generate();
+
+  GridSizeSingleton.initListeners(grid);
 }
 
 bootstrap();

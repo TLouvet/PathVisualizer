@@ -1,17 +1,16 @@
 import { PerformanceComponent } from '../PerformanceComponent.js';
 import { Path } from './Path.js';
-import { Search4DirectionComponent } from './component/Search4DirectionComponent.js';
-import { Search8DirectionsComponent } from './component/Search8DirectionComponent.js';
+import { SearchComponentFactory } from './component/SearchComponentFactory.js';
 export class AbstractSearchStrategy {
     nodes;
-    searchComponent;
     path;
     performanceMonitorComponent;
-    constructor(nodes, searchComponent) {
+    searchComponent;
+    constructor(nodes) {
         this.nodes = nodes;
-        this.searchComponent = searchComponent;
         this.path = new Path();
         this.performanceMonitorComponent = new PerformanceComponent();
+        this.searchComponent = SearchComponentFactory.createSearchComponent(nodes);
     }
     clear() {
         this.nodes.forEach((node) => {
@@ -21,12 +20,7 @@ export class AbstractSearchStrategy {
         });
         this.path.clear();
     }
-    changeSearchComponent(searchComponentType) {
-        if (searchComponentType === '4D') {
-            this.searchComponent = new Search4DirectionComponent(this.nodes);
-        }
-        else {
-            this.searchComponent = new Search8DirectionsComponent(this.nodes);
-        }
+    changeSearchComponent() {
+        this.searchComponent = SearchComponentFactory.createSearchComponent(this.nodes);
     }
 }
