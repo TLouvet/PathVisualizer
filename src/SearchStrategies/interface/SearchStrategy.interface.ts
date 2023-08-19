@@ -1,5 +1,7 @@
+import { GraphNode } from '../../GraphNode/GraphNode';
+
 export interface SearchStrategy {
-  solve(): void;
+  solve(start: GraphNode | null, end: GraphNode | null): void;
   clear(): void;
   changeSearchComponent(): void;
 }

@@ -8,10 +8,8 @@ import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 export class DijkstraStrategy extends AbstractSearchStrategy {
   private heap: DijkstraMinBinaryHeap = new DijkstraMinBinaryHeap();
 
-  solve(): void {
+  solve(start: GraphNode | null, end: GraphNode | null): void {
     this.performanceMonitorComponent.start();
-    const start = this.nodes.find((node) => node.isStart());
-    const end = this.nodes.find((node) => node.isEnd());
     if (!start || !end) return;
 
     if (!this.dijkstra(start, end)) {

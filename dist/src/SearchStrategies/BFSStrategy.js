@@ -2,10 +2,8 @@ import { PathStartState } from '../GraphNode/State/PathStartState.js';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState.js';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy.js';
 export class BFSStrategy extends AbstractSearchStrategy {
-    solve() {
+    solve(start, end) {
         this.performanceMonitorComponent.start();
-        const start = this.nodes.find((node) => node.isStart());
-        const end = this.nodes.find((node) => node.isEnd());
         if (!start || !end)
             return;
         if (!this.bfs(start, end)) {

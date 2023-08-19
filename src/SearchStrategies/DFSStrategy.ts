@@ -5,11 +5,10 @@ import { PathOption } from '../PathOption.enum';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 
 export class DFSStrategy extends AbstractSearchStrategy {
-  solve() {
+  solve(start: GraphNode | null, end: GraphNode | null) {
     // Lot of duplication here
     this.performanceMonitorComponent.start();
-    const start = this.nodes.find((node) => node.getCurrentPath() === PathOption.START);
-    const end = this.nodes.find((node) => node.getCurrentPath() === PathOption.END);
+
     if (!start || !end) {
       return;
     }
@@ -25,7 +24,6 @@ export class DFSStrategy extends AbstractSearchStrategy {
   private dfs(start: GraphNode, end: GraphNode) {
     if (start.node.id === end.node.id) {
       this.path.display();
-      console.log(this.path);
       end.changeState(new PathEndState());
       return true;
     }

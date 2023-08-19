@@ -1,13 +1,16 @@
+import { CreateSearchStrategyFactory } from './SearchStrategies/CreateSearchStrategyFactory.js';
 export class Solver {
+    searchStrategyFactory;
     strategy;
-    constructor(strategy) {
-        this.strategy = strategy;
+    constructor(nodes) {
+        this.searchStrategyFactory = new CreateSearchStrategyFactory();
+        this.strategy = this.searchStrategyFactory.getStrategy(nodes);
     }
-    solve() {
-        this.strategy.solve();
+    solve(start, end) {
+        this.strategy.solve(start, end);
     }
-    changeStrategy(strategy) {
-        this.strategy = strategy;
+    changeStrategy(nodes) {
+        this.strategy = this.searchStrategyFactory.getStrategy(nodes);
     }
     changeSearchComponent() {
         this.strategy.changeSearchComponent();

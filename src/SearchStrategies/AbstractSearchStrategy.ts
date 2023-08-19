@@ -9,25 +9,22 @@ export abstract class AbstractSearchStrategy implements SearchStrategy {
   protected path: Path;
   protected performanceMonitorComponent: PerformanceComponent;
   protected searchComponent: ISearchComponent;
+  protected searchComponentFactory: SearchComponentFactory;
 
   constructor(protected nodes: GraphNode[]) {
     this.path = new Path();
     this.performanceMonitorComponent = new PerformanceComponent();
-    this.searchComponent = SearchComponentFactory.createSearchComponent(nodes);
+    this.searchComponentFactory = new SearchComponentFactory();
+    this.searchComponent = this.searchComponentFactory.createSearchComponent(nodes);
   }
 
   clear() {
-    this.nodes.forEach((node) => {
-      node.parent = null;
-      node.localValue = Infinity;
-      node.globalValue = Infinity;
-    });
     this.path.clear();
   }
 
   changeSearchComponent() {
-    this.searchComponent = SearchComponentFactory.createSearchComponent(this.nodes);
+    this.searchComponent = this.searchComponentFactory.createSearchComponent(this.nodes);
   }
 
-  abstract solve(): void;
+  abstract solve(start: GraphNode | null, end: GraphNode | null): void;
 }

@@ -1,24 +1,21 @@
 import { GraphNode } from './GraphNode/GraphNode';
 import { GridGenerator } from './GridGenerator';
 import { GridController } from './GridController';
-import { BFSStrategy } from './SearchStrategies/BFSStrategy';
-import { DFSStrategy } from './SearchStrategies/DFSStrategy';
 import { ESearchStrategy } from './SearchStrategies/enum/SearchStrategy.enum';
-import { SearchStrategy } from './SearchStrategies/interface/SearchStrategy.interface';
 import { Solver } from './Solver';
 import { PathOption } from './PathOption.enum';
-import { DijkstraStrategy } from './SearchStrategies/DijkstraStrategy';
-import { AStarStrategy } from './SearchStrategies/AStarStrategy';
 import { ESearchDirection, SearchDirectionSingleton } from './SearchDirectionSingleton';
 
 export class Grid {
   static IS_CLICKING = false;
   static showVisitedNodes = false;
+  static CURRENT_SEARCH_STRATEGY: ESearchStrategy = ESearchStrategy.DFS;
+  static START_NODE: GraphNode | null = null;
+  static END_NODE: GraphNode | null = null;
 
   private gridHTMLGenerator: GridGenerator;
   public nodes: GraphNode[];
   private solver: Solver;
-  private strategies: SearchStrategy[];
   private gridController: GridController;
 
   // TODO: refactor this because wow i cant evn read my own code
@@ -30,14 +27,7 @@ export class Grid {
     this.initListeners('btn-algo-dijkstra', ESearchStrategy.DIJKSTRA);
     this.initListeners('btn-algo-astar', ESearchStrategy.ASTAR);
 
-    // Weird that i still have to redeclare it in the generate mthod...
-    this.strategies = [
-      new DFSStrategy(this.nodes),
-      new BFSStrategy(this.nodes),
-      new DijkstraStrategy(this.nodes),
-      new AStarStrategy(this.nodes),
-    ];
-    this.solver = new Solver(this.strategies[0]);
+    this.solver = new Solver(this.nodes);
     this.gridController = new GridController(this.solver);
 
     // finalement ça ne touche que le pathstate visited
@@ -71,41 +61,21 @@ export class Grid {
     document.getElementById(id)?.addEventListener('click', () => {
       document.querySelectorAll('.algo-selected').forEach((btn) => btn.classList.remove('algo-selected'));
       document.getElementById(id)?.classList.add('algo-selected');
-      switch (type) {
-        case ESearchStrategy.DFS:
-          this.changeSolverStrategy(new DFSStrategy(this.nodes));
-          break;
-        case ESearchStrategy.BFS:
-          this.changeSolverStrategy(new BFSStrategy(this.nodes));
-          break;
-        case ESearchStrategy.DIJKSTRA:
-          this.changeSolverStrategy(new DijkstraStrategy(this.nodes));
-          break;
-        case ESearchStrategy.ASTAR:
-          this.changeSolverStrategy(new AStarStrategy(this.nodes));
-          break;
-        default:
-          break;
-      }
+
+      Grid.CURRENT_SEARCH_STRATEGY = type;
+      this.changeSolverStrategy();
       this.gridController.recalculateSolution(this.nodes);
     });
   }
 
-  changeSolverStrategy(strategy: SearchStrategy) {
-    this.solver.changeStrategy(strategy);
+  changeSolverStrategy() {
+    this.solver.changeStrategy(this.nodes);
   }
 
   generate() {
     this.nodes = this.gridHTMLGenerator.injectIntoBody();
     this.gridController.generateListeners(this.nodes);
-    // Weird that i still have to redeclare it in the generate mthod...
-    this.strategies = [
-      new DFSStrategy(this.nodes),
-      new BFSStrategy(this.nodes),
-      new DijkstraStrategy(this.nodes),
-      new AStarStrategy(this.nodes),
-    ];
-    this.solver.changeStrategy(this.strategies[0]);
+    this.solver.changeStrategy(this.nodes);
   }
 
   reinitialize() {

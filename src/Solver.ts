@@ -1,14 +1,22 @@
+import { GraphNode } from './GraphNode/GraphNode';
+import { CreateSearchStrategyFactory } from './SearchStrategies/CreateSearchStrategyFactory';
 import { SearchStrategy } from './SearchStrategies/interface/SearchStrategy.interface';
 
 export class Solver {
-  constructor(private strategy: SearchStrategy) {}
+  private searchStrategyFactory: CreateSearchStrategyFactory;
+  private strategy: SearchStrategy;
 
-  solve() {
-    this.strategy.solve();
+  constructor(nodes: GraphNode[]) {
+    this.searchStrategyFactory = new CreateSearchStrategyFactory();
+    this.strategy = this.searchStrategyFactory.getStrategy(nodes);
   }
 
-  changeStrategy(strategy: SearchStrategy) {
-    this.strategy = strategy;
+  solve(start: GraphNode | null, end: GraphNode | null) {
+    this.strategy.solve(start, end);
+  }
+
+  changeStrategy(nodes: GraphNode[]) {
+    this.strategy = this.searchStrategyFactory.getStrategy(nodes);
   }
 
   changeSearchComponent() {

@@ -85,17 +85,21 @@ export class GridController {
 
   recalculateSolution(nodes: GraphNode[]) {
     for (const node of nodes) {
+      node.reinitialize();
       if (node.isSolution() || node.isVisited()) {
-        node.reinitialize();
+        node.setNoneState();
       }
     }
 
     this.solver.clear();
-    this.solver.solve();
+    this.solver.solve(Grid.START_NODE, Grid.END_NODE);
   }
 
   reinitializeAll(nodes: GraphNode[]) {
     this.solver.clear();
-    nodes.forEach((node) => node.reinitialize());
+    nodes.forEach((node) => {
+      node.reinitialize();
+      node.setNoneState();
+    });
   }
 }

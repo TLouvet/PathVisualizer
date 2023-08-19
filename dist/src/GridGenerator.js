@@ -33,8 +33,8 @@ export class GridGenerator {
         const graphNode = new GraphNode(squareHTML);
         squareHTML.setAttribute('id', id);
         squareHTML.setAttribute('class', 'square path-none');
-        squareHTML.style.width = 100 / GridSizeSingleton.GRID_WIDTH - 0.5 + 'vw';
-        squareHTML.style.height = 100 / GridSizeSingleton.GRID_HEIGHT - 0.5 + 'vw';
+        squareHTML.style.width = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
+        squareHTML.style.height = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
         return graphNode;
     }
 }

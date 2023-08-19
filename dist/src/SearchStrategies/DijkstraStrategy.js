@@ -5,10 +5,8 @@ import { PathOption } from '../PathOption.enum.js';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy.js';
 export class DijkstraStrategy extends AbstractSearchStrategy {
     heap = new DijkstraMinBinaryHeap();
-    solve() {
+    solve(start, end) {
         this.performanceMonitorComponent.start();
-        const start = this.nodes.find((node) => node.isStart());
-        const end = this.nodes.find((node) => node.isEnd());
         if (!start || !end)
             return;
         if (!this.dijkstra(start, end)) {

@@ -4,8 +4,6 @@ import { PathStartState } from '../GraphNode/State/PathStartState';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 
-// TODO I think this is not a real A* algorithm
-
 export class AStarStrategy extends AbstractSearchStrategy {
   private heap: MinBinaryHeap = new MinBinaryHeap();
 
@@ -14,11 +12,8 @@ export class AStarStrategy extends AbstractSearchStrategy {
     this.heap.clear();
   }
 
-  solve(): void {
+  solve(start: GraphNode | null, end: GraphNode | null): void {
     this.performanceMonitorComponent.start();
-
-    const start = this.nodes.find((node) => node.isStart());
-    const end = this.nodes.find((node) => node.isEnd());
     if (!start || !end) return;
 
     this.astar(start, end);
@@ -30,11 +25,10 @@ export class AStarStrategy extends AbstractSearchStrategy {
     start.globalValue = this.getEuclidianDistance(start, end);
     this.heap.insert(start);
 
-    let sum = 0;
-
     while (!this.heap.isEmpty()) {
       const currentNode = this.heap.extractMin();
-      // If we find the end node we return true -- this breaks the a* algorithm ad we don't get the shortest path
+      // If we find the end node we return true -- this breaks the a* algorithm ad we don't automatically get the shortest path
+      // It does not matter in our grid implementation because the distances are all the same but would matter in a graph with different weights
       if (currentNode.isEnd()) {
         // Here we should just have a continue statement
         let node = currentNode;
@@ -45,14 +39,10 @@ export class AStarStrategy extends AbstractSearchStrategy {
         this.path.push(node);
         this.path.display();
         start.changeState(new PathStartState()); // We have overidden this state on the first pass, but as we do not want to check for this all turns, we put back the original state
-        console.log(`A* updatinglocale took ${sum} milliseconds`);
         return true;
       }
 
-      // We get the adjacent nodes
       const adjacentNodes = this.searchComponent.getAdjacentNodes(currentNode);
-      // we update the local value of the adjacent nodes
-      const updateStart = performance.now();
 
       for (const node of adjacentNodes) {
         const manhattanDistance = this.getEuclidianDistance(currentNode, node); // Ca c'est ce qui ralentit le plus dans cette boucle, mais c'est aussi ce qu'on peut précalculer
@@ -64,7 +54,6 @@ export class AStarStrategy extends AbstractSearchStrategy {
           this.heap.insert(node);
         }
       }
-      sum += performance.now() - updateStart;
 
       currentNode.changeState(new PathVisitedState());
     }

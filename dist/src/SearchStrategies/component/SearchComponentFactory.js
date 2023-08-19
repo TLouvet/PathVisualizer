@@ -2,8 +2,7 @@ import { ESearchDirection, SearchDirectionSingleton } from '../../SearchDirectio
 import { Search4DirectionComponent } from './Search4DirectionComponent.js';
 import { Search8DirectionComponent } from './Search8DirectionComponent.js';
 export class SearchComponentFactory {
-    constructor() { }
-    static createSearchComponent(nodes) {
+    createSearchComponent(nodes) {
         if (SearchDirectionSingleton.searchDirection === ESearchDirection['4D']) {
             return new Search4DirectionComponent(nodes);
         }

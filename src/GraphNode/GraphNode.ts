@@ -1,3 +1,4 @@
+import { Grid } from '../Grid';
 import { PathOption } from '../PathOption.enum';
 import { PathSelectorSingleton } from '../PathSelectorSingleton';
 import { PathNoneState } from './State/PathNoneState';
@@ -23,6 +24,14 @@ export class GraphNode {
 
   changeState(newState: PathState): void {
     this.state = newState;
+
+    if (this.isStart()) {
+      Grid.START_NODE = this;
+    }
+    if (this.isEnd()) {
+      Grid.END_NODE = this;
+    }
+
     this.state.render(this.node);
   }
 
@@ -34,6 +43,9 @@ export class GraphNode {
     this.parent = null;
     this.localValue = Infinity;
     this.globalValue = Infinity;
+  }
+
+  setNoneState() {
     this.changeState(new PathNoneState());
   }
 

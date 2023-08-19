@@ -1,13 +1,10 @@
 import { PathEndState } from '../GraphNode/State/PathEndState.js';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState.js';
-import { PathOption } from '../PathOption.enum.js';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy.js';
 export class DFSStrategy extends AbstractSearchStrategy {
-    solve() {
+    solve(start, end) {
         // Lot of duplication here
         this.performanceMonitorComponent.start();
-        const start = this.nodes.find((node) => node.getCurrentPath() === PathOption.START);
-        const end = this.nodes.find((node) => node.getCurrentPath() === PathOption.END);
         if (!start || !end) {
             return;
         }
@@ -20,7 +17,6 @@ export class DFSStrategy extends AbstractSearchStrategy {
     dfs(start, end) {
         if (start.node.id === end.node.id) {
             this.path.display();
-            console.log(this.path);
             end.changeState(new PathEndState());
             return true;
         }

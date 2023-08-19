@@ -1,3 +1,4 @@
+import { Grid } from '../Grid.js';
 import { PathOption } from '../PathOption.enum.js';
 import { PathSelectorSingleton } from '../PathSelectorSingleton.js';
 import { PathNoneState } from './State/PathNoneState.js';
@@ -24,6 +25,12 @@ export class GraphNode {
     }
     changeState(newState) {
         this.state = newState;
+        if (this.isStart()) {
+            Grid.START_NODE = this;
+        }
+        if (this.isEnd()) {
+            Grid.END_NODE = this;
+        }
         this.state.render(this.node);
     }
     getCurrentPath() {
@@ -33,6 +40,8 @@ export class GraphNode {
         this.parent = null;
         this.localValue = Infinity;
         this.globalValue = Infinity;
+    }
+    setNoneState() {
         this.changeState(new PathNoneState());
     }
     isStart() {

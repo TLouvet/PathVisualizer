@@ -6,21 +6,18 @@ export class AbstractSearchStrategy {
     path;
     performanceMonitorComponent;
     searchComponent;
+    searchComponentFactory;
     constructor(nodes) {
         this.nodes = nodes;
         this.path = new Path();
         this.performanceMonitorComponent = new PerformanceComponent();
-        this.searchComponent = SearchComponentFactory.createSearchComponent(nodes);
+        this.searchComponentFactory = new SearchComponentFactory();
+        this.searchComponent = this.searchComponentFactory.createSearchComponent(nodes);
     }
     clear() {
-        this.nodes.forEach((node) => {
-            node.parent = null;
-            node.localValue = Infinity;
-            node.globalValue = Infinity;
-        });
         this.path.clear();
     }
     changeSearchComponent() {
-        this.searchComponent = SearchComponentFactory.createSearchComponent(this.nodes);
+        this.searchComponent = this.searchComponentFactory.createSearchComponent(this.nodes);
     }
 }
