@@ -23,9 +23,3 @@ bootstrap();
 // Pour la partie explication, implémenter un système de tabs
 
 // jump point search ?
-
-// remove start not working
-
-// Les algo se lancent même si pas de end ?
-
-// La mécanique de réinit all est cassée

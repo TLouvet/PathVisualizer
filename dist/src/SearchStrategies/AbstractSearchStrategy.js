@@ -1,4 +1,4 @@
-import { PerformanceComponent } from '../PerformanceComponent.js';
+import { PerformanceComponent } from '../Performance/PerformanceComponent.js';
 import { Path } from './Path.js';
 import { SearchComponentFactory } from './component/SearchComponentFactory.js';
 export class AbstractSearchStrategy {

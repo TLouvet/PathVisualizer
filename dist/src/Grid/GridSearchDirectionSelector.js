@@ -5,13 +5,12 @@ export class GridSearchDirectionSelector {
     eightDirectionButton = 'btn-directional-8d';
     // TODO create the related HTML
     initListeners(grid) {
-        document.getElementById(this.fourDirectionButton)?.addEventListener('click', (e) => {
-            SearchDirectionSingleton.searchDirection = ESearchDirection['4D'];
-            this.transferCssClasses(e.target);
-            grid.recalculateSolution();
-        });
-        document.getElementById(this.eightDirectionButton)?.addEventListener('click', (e) => {
-            SearchDirectionSingleton.searchDirection = ESearchDirection['8D'];
+        this.initListener(this.fourDirectionButton, ESearchDirection['4D'], grid);
+        this.initListener(this.eightDirectionButton, ESearchDirection['8D'], grid);
+    }
+    initListener(id, direction, grid) {
+        document.getElementById(id)?.addEventListener('click', (e) => {
+            SearchDirectionSingleton.searchDirection = direction;
             this.transferCssClasses(e.target);
             grid.recalculateSolution();
         });

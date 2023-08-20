@@ -36,8 +36,11 @@ export class GridGenerator {
     const squareHTML = document.createElement('div');
     squareHTML.setAttribute('id', id);
     squareHTML.setAttribute('class', 'square path-none');
-    squareHTML.style.width = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
-    squareHTML.style.height = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
+    // squareHTML.style.width = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
+    // squareHTML.style.height = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
+
+    squareHTML.style.width = '1vw';
+    squareHTML.style.height = '1vw';
     const graphNode = new GraphNode(squareHTML);
     return graphNode;
   }

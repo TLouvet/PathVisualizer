@@ -1,4 +1,4 @@
-import { ESearchDirection, SearchDirectionSingleton } from './SearchDirectionSingleton.js.js.js.js';
+import { ESearchDirection, SearchDirectionSingleton } from './SearchDirectionSingleton.js.js.js.js.js.js.js.js.js.js.js.js.js.js';
 export class GridSearchDirectionSelector {
     relatedCssClass = 'direction-selected';
     initListeners(grid) {

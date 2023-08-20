@@ -1,6 +1,7 @@
 export class GridSizeSingleton {
-    static GRID_WIDTH = 20;
-    static GRID_HEIGHT = 20;
+    //TODO REFLECT INTIAL VALUES IN THE UI
+    static GRID_WIDTH = 35;
+    static GRID_HEIGHT = 35;
     constructor() { }
     static initListeners(grid) {
         document.getElementById('grid-size-slider-height')?.addEventListener('input', (e) => {

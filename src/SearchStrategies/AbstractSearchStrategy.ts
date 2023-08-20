@@ -1,5 +1,5 @@
 import { GraphNode } from '../GraphNode/GraphNode';
-import { PerformanceComponent } from '../PerformanceComponent';
+import { PerformanceComponent } from '../Performance/PerformanceComponent';
 import { Path } from './Path';
 import { SearchComponentFactory } from './component/SearchComponentFactory';
 import { ISearchComponent } from './interface/ISearchComponent.interface';
