@@ -1,4 +1,5 @@
 import { GraphNode } from '../GraphNode/GraphNode';
+import { PathEndState } from '../GraphNode/State/PathEndState';
 import { PathStartState } from '../GraphNode/State/PathStartState';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
@@ -10,7 +11,6 @@ export class BFSStrategy extends AbstractSearchStrategy {
     if (!start || !end) return;
 
     if (!this.bfs(start, end)) {
-      this.path.isValid = false;
       console.log('No path found using BFS');
     }
 
@@ -21,12 +21,8 @@ export class BFSStrategy extends AbstractSearchStrategy {
     const queue = [start];
     while (queue.length > 0) {
       const currentGraphNode = queue.shift() as GraphNode;
-      const adjacentNodes = this.searchComponent.getAdjacentNodes(currentGraphNode);
-      adjacentNodes.forEach((node) => (node.parent = currentGraphNode));
-
-      // A refactor
-      if (this.endNodeIsFound(adjacentNodes)) {
-        let node = adjacentNodes.find((node) => node.isEnd()) as GraphNode;
+      if (currentGraphNode.row === end.row && currentGraphNode.col === end.col) {
+        let node = currentGraphNode;
         while (node?.parent) {
           this.path.push(node);
           node = node.parent;
@@ -34,12 +30,14 @@ export class BFSStrategy extends AbstractSearchStrategy {
         this.path.push(node);
         this.path.display();
         start.changeState(new PathStartState()); // We have overidden this state on the first pass, but as we do not want to check for this all turns, we put back the original state
-
+        end.changeState(new PathEndState()); // same as above
         return true;
       }
 
+      const adjacentNodes = this.searchComponent.getAdjacentNodes(currentGraphNode);
       adjacentNodes.forEach((node) => {
-        node.changeState(new PathVisitedState());
+        node.parent = currentGraphNode;
+        node.changeState(new PathVisitedState()); // with a discovered state, we could avoid that and simplify the algorithm
       });
 
       queue.push(...adjacentNodes);

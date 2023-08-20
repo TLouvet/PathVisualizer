@@ -1,12 +1,13 @@
-import { DijkstraMinBinaryHeap } from '../DataStructure/DijkstraMinHeap';
+import { MinBinaryHeap } from '../DataStructure/MinHeap';
 import { GraphNode } from '../GraphNode/GraphNode';
+import { PathEndState } from '../GraphNode/State/PathEndState';
 import { PathStartState } from '../GraphNode/State/PathStartState';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState';
 import { PathOption } from '../PathOption.enum';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 
 export class DijkstraStrategy extends AbstractSearchStrategy {
-  private heap: DijkstraMinBinaryHeap = new DijkstraMinBinaryHeap();
+  private heap: MinBinaryHeap<GraphNode> = new MinBinaryHeap('localValue');
 
   solve(start: GraphNode | null, end: GraphNode | null): void {
     this.performanceMonitorComponent.start();
@@ -42,7 +43,7 @@ export class DijkstraStrategy extends AbstractSearchStrategy {
       const adjacentNodes = this.searchComponent.getAdjacentNodes(currentNode);
 
       for (const adjacentNode of adjacentNodes) {
-        const distance = this.getEuclidianDistance(currentNode, adjacentNode);
+        const distance = this.searchComponent.getDistance(currentNode, adjacentNode);
 
         if (adjacentNode.localValue > currentNode.localValue + distance) {
           adjacentNode.localValue = currentNode.localValue + distance;
@@ -56,11 +57,5 @@ export class DijkstraStrategy extends AbstractSearchStrategy {
 
     start.changeState(new PathStartState()); // We have overidden this state on the first pass, but as we do not want to check for this all turns, we put back the original state
     return false;
-  }
-
-  private getEuclidianDistance(currentNode: GraphNode, endNode: GraphNode): number {
-    const [currentX, currentY] = currentNode.node.id.substring(1).split('-').map(Number);
-    const [endX, endY] = endNode.node.id.substring(1).split('-').map(Number);
-    return Math.sqrt(Math.pow(currentX - endX, 2) + Math.pow(currentY - endY, 2));
   }
 }

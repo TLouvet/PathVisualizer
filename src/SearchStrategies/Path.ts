@@ -2,12 +2,10 @@ import { GraphNode } from '../GraphNode/GraphNode';
 import { PathSolutionState } from '../GraphNode/State/PathSolutionState';
 
 export class Path {
-  public isValid: boolean;
   public nodes: GraphNode[];
 
   constructor() {
     this.nodes = [];
-    this.isValid = false;
   }
 
   pop() {
@@ -19,21 +17,14 @@ export class Path {
   }
 
   display() {
-    this.isValid = true;
     this.nodes.forEach((node) => {
-      if (this.isStartOrEnd(node)) {
-        return;
+      if (!this.isStartOrEnd(node)) {
+        node.changeState(new PathSolutionState());
       }
-      node.changeState(new PathSolutionState());
     });
   }
 
   private isStartOrEnd(node: GraphNode) {
     return node.isStart() || node.isEnd();
-  }
-
-  clear() {
-    this.isValid = false;
-    this.nodes = [];
   }
 }

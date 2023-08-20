@@ -11,19 +11,15 @@ export abstract class AbstractSearchStrategy implements SearchStrategy {
   protected searchComponent: ISearchComponent;
   protected searchComponentFactory: SearchComponentFactory;
 
-  constructor(protected nodes: GraphNode[]) {
+  constructor(nodes: GraphNode[]) {
     this.path = new Path();
     this.performanceMonitorComponent = new PerformanceComponent();
     this.searchComponentFactory = new SearchComponentFactory();
     this.searchComponent = this.searchComponentFactory.createSearchComponent(nodes);
   }
 
-  clear() {
-    this.path.clear();
-  }
-
-  changeSearchComponent() {
-    this.searchComponent = this.searchComponentFactory.createSearchComponent(this.nodes);
+  changeSearchComponent(nodes: GraphNode[]) {
+    this.searchComponent = this.searchComponentFactory.createSearchComponent(nodes);
   }
 
   abstract solve(start: GraphNode | null, end: GraphNode | null): void;

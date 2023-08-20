@@ -1,5 +1,4 @@
 import { GraphNode } from '../GraphNode/GraphNode';
-import { Grid } from '../Grid';
 import { AStarStrategy } from './AStarStrategy';
 import { BFSStrategy } from './BFSStrategy';
 import { DFSStrategy } from './DFSStrategy';
@@ -8,8 +7,8 @@ import { ESearchStrategy } from './enum/SearchStrategy.enum';
 import { SearchStrategy } from './interface/SearchStrategy.interface';
 
 export class CreateSearchStrategyFactory {
-  getStrategy(nodes: GraphNode[]): SearchStrategy {
-    switch (Grid.CURRENT_SEARCH_STRATEGY) {
+  getStrategy(type: ESearchStrategy, nodes: GraphNode[]): SearchStrategy {
+    switch (type) {
       case ESearchStrategy.DFS:
         return new DFSStrategy(nodes);
       case ESearchStrategy.BFS:

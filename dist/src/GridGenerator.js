@@ -30,11 +30,11 @@ export class GridGenerator {
     }
     createSquare(id) {
         const squareHTML = document.createElement('div');
-        const graphNode = new GraphNode(squareHTML);
         squareHTML.setAttribute('id', id);
         squareHTML.setAttribute('class', 'square path-none');
         squareHTML.style.width = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
         squareHTML.style.height = 100 / Math.min(GridSizeSingleton.GRID_WIDTH - 0.5, 1) + 'vw';
+        const graphNode = new GraphNode(squareHTML);
         return graphNode;
     }
 }

@@ -1,12 +1,11 @@
-import { Grid } from '../Grid.js';
 import { AStarStrategy } from './AStarStrategy.js';
 import { BFSStrategy } from './BFSStrategy.js';
 import { DFSStrategy } from './DFSStrategy.js';
 import { DijkstraStrategy } from './DijkstraStrategy.js';
 import { ESearchStrategy } from './enum/SearchStrategy.enum.js';
 export class CreateSearchStrategyFactory {
-    getStrategy(nodes) {
-        switch (Grid.CURRENT_SEARCH_STRATEGY) {
+    getStrategy(type, nodes) {
+        switch (type) {
             case ESearchStrategy.DFS:
                 return new DFSStrategy(nodes);
             case ESearchStrategy.BFS:

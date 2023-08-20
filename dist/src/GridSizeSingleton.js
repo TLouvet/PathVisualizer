@@ -15,3 +15,4 @@ export class GridSizeSingleton {
         });
     }
 }
+// The thing is that in order to be complete, it should also make the rendering of the buttons, thus the package would be reusable in other projects

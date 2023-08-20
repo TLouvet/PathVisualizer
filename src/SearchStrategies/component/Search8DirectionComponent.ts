@@ -1,12 +1,21 @@
+import { Distance2D } from '../../Distance/Distance.interface';
+import { EuclidianDistance } from '../../Distance/EuclidianDistance';
 import { GraphNode } from '../../GraphNode/GraphNode';
+import { Point2D } from '../../Point2D/Point2D.interface';
 import { ISearchComponent } from '../interface/ISearchComponent.interface';
 import { SearchComponentHelper } from './SearchComponentHelper';
 
 export class Search8DirectionComponent implements ISearchComponent {
-  constructor(nodes: GraphNode[], private searchHelper: SearchComponentHelper = new SearchComponentHelper(nodes)) {}
+  private searchHelper: SearchComponentHelper;
+  private distanceComponent: Distance2D;
 
-  getAdjacentNodes(currentNode: GraphNode) {
-    const [row, col] = currentNode.node.id.substring(1).split('-').map(Number);
+  constructor(nodes: GraphNode[]) {
+    this.searchHelper = new SearchComponentHelper(nodes);
+    this.distanceComponent = new EuclidianDistance();
+  }
+
+  getAdjacentNodes(currentNode: Point2D) {
+    const { row, col } = currentNode;
     const { GRID_HEIGHT, GRID_WIDTH } = this.searchHelper.getGridSize();
 
     const leftNode = this.searchHelper.getNode(col > 0, col - 1, row);
@@ -29,5 +38,9 @@ export class Search8DirectionComponent implements ISearchComponent {
       bottomLeftNode,
       bottomRightNode,
     ]);
+  }
+
+  getDistance(currentNode: Point2D, endNode: Point2D): number {
+    return this.distanceComponent.calculate(currentNode, endNode);
   }
 }

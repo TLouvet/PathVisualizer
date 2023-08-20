@@ -9,12 +9,17 @@ export class GraphNode {
     parent;
     localValue;
     globalValue;
+    row;
+    col;
     constructor(node, state = new PathNoneState(), parent = null, localValue = Infinity, globalValue = Infinity) {
         this.node = node;
         this.state = state;
         this.parent = parent;
         this.localValue = localValue;
         this.globalValue = globalValue;
+        const [row, col] = this.node.id.substring(1).split('-').map(Number);
+        this.row = row;
+        this.col = col;
     }
     updatePathState() {
         if (this.state.path === PathSelectorSingleton.currentPath) {

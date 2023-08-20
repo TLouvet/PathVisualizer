@@ -11,6 +11,9 @@ bootstrap();
 // State pour discovered ?
 // refactor les algo
 // Refactor la classe grid
-// Distance classes à implémenter et intégrer dans les algo
 // Fill wall et fill void
 // Pour la partie explication, implémenter un système de tabs
+// jump point search ?
+// remove start not working
+// Les algo se lancent même si pas de end ?
+// La mécanique de réinit all est cassée

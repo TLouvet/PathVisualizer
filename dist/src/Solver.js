@@ -1,21 +1,23 @@
-import { CreateSearchStrategyFactory } from './SearchStrategies/CreateSearchStrategyFactory.js';
 export class Solver {
-    searchStrategyFactory;
-    strategy;
+    // private searchStrategyFactory: CreateSearchStrategyFactory;
+    // private strategy: SearchStrategy;
     constructor(nodes) {
-        this.searchStrategyFactory = new CreateSearchStrategyFactory();
-        this.strategy = this.searchStrategyFactory.getStrategy(nodes);
+        // this.searchStrategyFactory = new CreateSearchStrategyFactory();
+        // this.strategy = this.searchStrategyFactory.getStrategy(nodes);
     }
-    solve(start, end) {
-        this.strategy.solve(start, end);
-    }
-    changeStrategy(nodes) {
-        this.strategy = this.searchStrategyFactory.getStrategy(nodes);
-    }
-    changeSearchComponent() {
-        this.strategy.changeSearchComponent();
-    }
-    clear() {
-        this.strategy.clear();
+    // solve(start: GraphNode | null, end: GraphNode | null) {
+    //   this.strategy.solve(start, end);
+    // }
+    // changeStrategy(nodes: GraphNode[]) {
+    //   this.strategy = this.searchStrategyFactory.getStrategy(nodes);
+    // }
+    // changeSearchComponent(nodes: GraphNode[]) {
+    //   this.strategy.changeSearchComponent(nodes);
+    // }
+    // clear() {
+    //   this.strategy.clear();
+    // }
+    executeStrategy(strategy, start, end) {
+        return strategy.solve(start, end);
     }
 }

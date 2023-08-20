@@ -1,19 +1,16 @@
 import { MinBinaryHeap } from '../DataStructure/MinHeap';
 import { GraphNode } from '../GraphNode/GraphNode';
+import { PathEndState } from '../GraphNode/State/PathEndState';
 import { PathStartState } from '../GraphNode/State/PathStartState';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 
 export class AStarStrategy extends AbstractSearchStrategy {
-  private heap: MinBinaryHeap = new MinBinaryHeap();
-
-  clear(): void {
-    super.clear();
-    this.heap.clear();
-  }
+  private heap: MinBinaryHeap<GraphNode> = new MinBinaryHeap<GraphNode>('globalValue');
 
   solve(start: GraphNode | null, end: GraphNode | null): void {
     this.performanceMonitorComponent.start();
+
     if (!start || !end) return;
 
     this.astar(start, end);
@@ -22,7 +19,7 @@ export class AStarStrategy extends AbstractSearchStrategy {
 
   private astar(start: GraphNode, end: GraphNode): boolean {
     start.localValue = 0;
-    start.globalValue = this.getEuclidianDistance(start, end);
+    start.globalValue = this.searchComponent.getDistance(start, end);
     this.heap.insert(start);
 
     while (!this.heap.isEmpty()) {
@@ -45,12 +42,12 @@ export class AStarStrategy extends AbstractSearchStrategy {
       const adjacentNodes = this.searchComponent.getAdjacentNodes(currentNode);
 
       for (const node of adjacentNodes) {
-        const manhattanDistance = this.getEuclidianDistance(currentNode, node); // Ca c'est ce qui ralentit le plus dans cette boucle, mais c'est aussi ce qu'on peut précalculer
+        const manhattanDistance = this.searchComponent.getDistance(currentNode, node); // Ca c'est ce qui ralentit le plus dans cette boucle, mais c'est aussi ce qu'on peut précalculer
 
         if (node.localValue > currentNode.localValue + manhattanDistance) {
           node.localValue = currentNode.localValue + manhattanDistance;
           node.parent = currentNode;
-          node.globalValue = node.localValue + this.getEuclidianDistance(node, end);
+          node.globalValue = node.localValue + this.searchComponent.getDistance(node, end);
           this.heap.insert(node);
         }
       }
@@ -60,17 +57,5 @@ export class AStarStrategy extends AbstractSearchStrategy {
 
     start.changeState(new PathStartState()); // We have overidden this state on the first pass, but as we do not want to check for this all turns, we put back the original state
     return false;
-  }
-
-  private getManhattanDistance(currentNode: GraphNode, endNode: GraphNode): number {
-    const [currentX, currentY] = currentNode.node.id.substring(1).split('-').map(Number);
-    const [endX, endY] = endNode.node.id.substring(1).split('-').map(Number);
-    return Math.abs(currentX - endX) + Math.abs(currentY - endY);
-  }
-
-  private getEuclidianDistance(currentNode: GraphNode, endNode: GraphNode): number {
-    const [currentX, currentY] = currentNode.node.id.substring(1).split('-').map(Number);
-    const [endX, endY] = endNode.node.id.substring(1).split('-').map(Number);
-    return Math.sqrt(Math.pow(currentX - endX, 2) + Math.pow(currentY - endY, 2));
   }
 }

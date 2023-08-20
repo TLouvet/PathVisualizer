@@ -1,18 +1,26 @@
 import { Grid } from '../Grid';
 import { PathOption } from '../PathOption.enum';
 import { PathSelectorSingleton } from '../PathSelectorSingleton';
+import { Point2D } from '../Point2D/Point2D.interface';
 import { PathNoneState } from './State/PathNoneState';
 import { PathState } from './State/PathState.interface';
 import { PathStateFactory } from './State/PathStateFactory';
 
-export class GraphNode {
+export class GraphNode implements Point2D {
+  public row: number;
+  public col: number;
+
   constructor(
     public node: HTMLDivElement,
     private state: PathState = new PathNoneState(),
     public parent: GraphNode | null = null,
     public localValue = Infinity,
     public globalValue = Infinity
-  ) {}
+  ) {
+    const [row, col] = this.node.id.substring(1).split('-').map(Number);
+    this.row = row;
+    this.col = col;
+  }
 
   updatePathState(): void {
     if (this.state.path === PathSelectorSingleton.currentPath) {

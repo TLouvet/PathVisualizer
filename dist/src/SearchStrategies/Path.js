@@ -1,10 +1,8 @@
 import { PathSolutionState } from '../GraphNode/State/PathSolutionState.js';
 export class Path {
-    isValid;
     nodes;
     constructor() {
         this.nodes = [];
-        this.isValid = false;
     }
     pop() {
         this.nodes.pop();
@@ -13,19 +11,13 @@ export class Path {
         this.nodes.push(node);
     }
     display() {
-        this.isValid = true;
         this.nodes.forEach((node) => {
-            if (this.isStartOrEnd(node)) {
-                return;
+            if (!this.isStartOrEnd(node)) {
+                node.changeState(new PathSolutionState());
             }
-            node.changeState(new PathSolutionState());
         });
     }
     isStartOrEnd(node) {
         return node.isStart() || node.isEnd();
-    }
-    clear() {
-        this.isValid = false;
-        this.nodes = [];
     }
 }
