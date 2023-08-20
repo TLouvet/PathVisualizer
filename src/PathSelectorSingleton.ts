@@ -1,4 +1,4 @@
-import { PathOption } from './PathOption.enum';
+import { PathOption } from './GraphNode/State/PathStateOption.enum';
 
 export class PathSelectorSingleton {
   private constructor() {}

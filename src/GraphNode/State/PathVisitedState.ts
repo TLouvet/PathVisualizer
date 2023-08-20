@@ -1,5 +1,5 @@
 import { Grid } from '../../Grid';
-import { PathOption } from '../../PathOption.enum';
+import { PathOption } from './PathStateOption.enum';
 import { AbstractPathState } from './AbstractPathState';
 
 export class PathVisitedState extends AbstractPathState {

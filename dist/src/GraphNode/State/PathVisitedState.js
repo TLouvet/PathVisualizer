@@ -1,5 +1,5 @@
 import { Grid } from '../../Grid.js';
-import { PathOption } from '../../PathOption.enum.js';
+import { PathOption } from './PathStateOption.enum.js';
 import { AbstractPathState } from './AbstractPathState.js';
 export class PathVisitedState extends AbstractPathState {
     constructor() {

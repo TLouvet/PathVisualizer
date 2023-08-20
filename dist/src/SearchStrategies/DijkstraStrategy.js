@@ -1,7 +1,7 @@
 import { MinBinaryHeap } from '../DataStructure/MinHeap.js';
 import { PathStartState } from '../GraphNode/State/PathStartState.js';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState.js';
-import { PathOption } from '../PathOption.enum.js';
+import { PathOption } from '../GraphNode/State/PathStateOption.enum.js';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy.js';
 export class DijkstraStrategy extends AbstractSearchStrategy {
     heap = new MinBinaryHeap('localValue');

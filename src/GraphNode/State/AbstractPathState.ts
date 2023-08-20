@@ -1,4 +1,4 @@
-import { PathOption } from '../../PathOption.enum';
+import { PathOption } from './PathStateOption.enum';
 import { PathState } from './PathState.interface';
 
 export abstract class AbstractPathState implements PathState {

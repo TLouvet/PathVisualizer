@@ -3,7 +3,7 @@ import { GraphNode } from '../GraphNode/GraphNode';
 import { PathEndState } from '../GraphNode/State/PathEndState';
 import { PathStartState } from '../GraphNode/State/PathStartState';
 import { PathVisitedState } from '../GraphNode/State/PathVisitedState';
-import { PathOption } from '../PathOption.enum';
+import { PathOption } from '../GraphNode/State/PathStateOption.enum';
 import { AbstractSearchStrategy } from './AbstractSearchStrategy';
 
 export class DijkstraStrategy extends AbstractSearchStrategy {

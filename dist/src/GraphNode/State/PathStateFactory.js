@@ -1,4 +1,4 @@
-import { PathOption } from '../../PathOption.enum.js';
+import { PathOption } from './PathStateOption.enum.js';
 import { PathSelectorSingleton } from '../../PathSelectorSingleton.js';
 import { PathEndState } from './PathEndState.js';
 import { PathNoneState } from './PathNoneState.js';

@@ -4,7 +4,7 @@ import { PathNoneState } from '../src/GraphNode/State/PathNoneState';
 import { PathStartState } from '../src/GraphNode/State/PathStartState';
 import { PathWallState } from '../src/GraphNode/State/PathWallState';
 import { Grid } from '../src/Grid';
-import { PathOption } from '../src/PathOption.enum';
+import { PathOption } from '../src/GraphNode/State/PathStateOption.enum';
 import { PathSelectorSingleton } from '../src/PathSelectorSingleton';
 /*
  - Definition

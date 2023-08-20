@@ -1,4 +1,4 @@
-import { PathOption } from '../../PathOption.enum';
+import { PathOption } from './PathStateOption.enum';
 
 export interface PathState {
   render(node: HTMLDivElement): void;

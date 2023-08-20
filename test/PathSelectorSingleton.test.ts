@@ -1,4 +1,4 @@
-import { PathOption } from '../src/PathOption.enum';
+import { PathOption } from '../src/GraphNode/State/PathStateOption.enum';
 import { PathSelectorSingleton } from '../src/PathSelectorSingleton';
 
 /*

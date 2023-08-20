@@ -1,4 +1,4 @@
-import { PathOption } from '../../PathOption.enum.js';
+import { PathOption } from './PathStateOption.enum.js';
 import { AbstractPathState } from './AbstractPathState.js';
 export class PathWallState extends AbstractPathState {
     constructor() {

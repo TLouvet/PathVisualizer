@@ -1,5 +1,4 @@
-import { Grid } from '../Grid';
-import { PathOption } from '../PathOption.enum';
+import { PathOption } from './State/PathStateOption.enum';
 import { PathSelectorSingleton } from '../PathSelectorSingleton';
 import { Point2D } from '../Point2D/Point2D.interface';
 import { PathNoneState } from './State/PathNoneState';
@@ -32,14 +31,6 @@ export class GraphNode implements Point2D {
 
   changeState(newState: PathState): void {
     this.state = newState;
-
-    if (this.isStart()) {
-      Grid.START_NODE = this;
-    }
-    if (this.isEnd()) {
-      Grid.END_NODE = this;
-    }
-
     this.state.render(this.node);
   }
 

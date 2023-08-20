@@ -1,4 +1,4 @@
-import { PathOption } from '../../PathOption.enum';
+import { PathOption } from './PathStateOption.enum';
 import { PathSelectorSingleton } from '../../PathSelectorSingleton';
 import { PathEndState } from './PathEndState';
 import { PathNoneState } from './PathNoneState';
