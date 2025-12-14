@@ -27,9 +27,11 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [manager, setManager] = useState<CanvasGridManager | null>(null);
+  const hasInitializedMaze = useRef(false);
 
   const gridWidth = useGridStore((state) => state.gridWidth);
   const gridHeight = useGridStore((state) => state.gridHeight);
+  const triggerAnimatedMaze = useGridStore((state) => state.triggerAnimatedMaze);
 
   // Initialize canvas grid manager
   useEffect(() => {
@@ -44,6 +46,17 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
       setManager(null);
     };
   }, [gridWidth, gridHeight]);
+
+  // Generate initial DFS maze on first load
+  useEffect(() => {
+    if (manager && !hasInitializedMaze.current) {
+      hasInitializedMaze.current = true;
+      // Small delay to ensure grid is fully initialized
+      setTimeout(() => {
+        triggerAnimatedMaze();
+      }, 100);
+    }
+  }, [manager, triggerAnimatedMaze]);
 
   // Create context value
   const contextValue = useMemo(

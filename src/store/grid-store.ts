@@ -5,7 +5,7 @@ import { MazeAlgorithm } from '../features/maze/types/maze';
 
 // Determine initial grid size based on device
 const getInitialGridSize = () => {
-  if (typeof window === 'undefined') return { width: 35, height: 20 };
+  if (typeof window === 'undefined') return { width: 35, height: 21 };
 
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -15,7 +15,7 @@ const getInitialGridSize = () => {
   }
 
   // Default size for desktop
-  return { width: 35, height: 20 };
+  return { width: 35, height: 21 };
 };
 
 const initialSize = getInitialGridSize();
