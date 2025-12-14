@@ -19,6 +19,7 @@ export function useAbortController(dependencies: unknown[] = []) {
       abortControllerRef.current.abort();
     }
     abortControllerRef.current = new AbortController();
+
     return abortControllerRef.current;
   }, []);
 

@@ -6,7 +6,7 @@ import { LandscapePrompt } from './components/layout/landscape-prompt';
 import { CanvasGridProvider } from './contexts/CanvasGridContext';
 import { useOrientation } from './shared/hooks/use-orientation';
 import { useIsMobile } from './shared/hooks/use-is-mobile';
-import { MazeView3D } from './components/grid/MazeView3D';
+import { MazeView3D } from './features/3d-view/components/MazeView3D';
 
 function App() {
   const orientation = useOrientation();

@@ -1,16 +1,21 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { useCanvasGridManager } from '../../contexts/CanvasGridContext';
-import { useGridStore } from '../../store/grid-store';
-import { Raycaster } from '../../utils/raycaster';
-import { use3DPlayer } from '../../hooks/use3DPlayer';
-import { PathOption } from '../../types/grid-node';
+import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
+import { useGridStore } from '@/store/grid-store';
+import { PathOption } from '@/types/grid-node';
+import { blendColors, adjustBrightness } from '@/shared/utils/color';
+import { Raycaster } from '../utils/raycaster';
+import { use3DPlayer } from '../hooks/use-3d-player';
+import { useMinimap } from '../hooks/use-minimap';
+import { useCanvas } from '../hooks/use-canvas';
+import { useControlsPanel } from '../hooks/use-controls-panel';
+import { isPositionWalkable } from '../utils/collision';
 
 interface MazeView3DProps {
   onExit: () => void;
 }
 
 export function MazeView3D({ onExit }: MazeView3DProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { canvasRef } = useCanvas();
   const { manager } = useCanvasGridManager();
   const gridWidth = useGridStore((state) => state.gridWidth);
   const gridHeight = useGridStore((state) => state.gridHeight);
@@ -19,17 +24,18 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
   const [hasWon, setHasWon] = useState(false);
   const [isPointerLocked, setIsPointerLocked] = useState(false);
 
-  // Pre-rendered minimap cache
-  const minimapCacheRef = useRef<HTMLCanvasElement | null>(null);
+  // Get node function for raycaster and minimap
+  const getNode = useCallback((row: number, col: number) => manager?.getNode(row, col) ?? null, [manager]);
 
-  // Get node function for raycaster
-  const getNode = useCallback(
-    (row: number, col: number) => {
-      if (!manager) return null;
-      return manager.getNode(row, col);
-    },
-    [manager]
-  );
+  // Minimap
+  const { drawMinimap } = useMinimap({
+    gridWidth,
+    gridHeight,
+    getNode,
+  });
+
+  // Controls panel
+  const { drawControlsPanel } = useControlsPanel();
 
   // Initialize raycaster
   useEffect(() => {
@@ -54,26 +60,19 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
 
       const col = Math.floor(x);
       const row = Math.floor(y);
-
-      if (col < 0 || col >= gridWidth || row < 0 || row >= gridHeight) {
-        return false;
-      }
-
       const node = manager.getNode(row, col);
-      if (!node) return false;
 
-      return node.state !== PathOption.WALL;
+      return isPositionWalkable(x, y, gridWidth, gridHeight, node);
     },
     [manager, gridWidth, gridHeight]
   );
 
   const startPos = getStartPosition();
-  const { player, resetPlayer, enableMouseLook } = use3DPlayer({
+  const { player, playerRef, resetPlayer, enableMouseLook, updatePlayer } = use3DPlayer({
     initialX: startPos.x,
     initialY: startPos.y,
     initialAngle: 0,
     moveSpeed: 2,
-    rotateSpeed: 1.5,
     canMove,
   });
 
@@ -142,66 +141,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     }
   }, [player.x, player.y, manager, onExit, hasWon]);
 
-  // Pre-render minimap (only once)
-  useEffect(() => {
-    if (!manager) return;
-
-    const minimapMaxSize = 150;
-    const aspectRatio = gridWidth / gridHeight;
-
-    let minimapWidth: number;
-    let minimapHeight: number;
-
-    if (aspectRatio > 1) {
-      // Width is larger
-      minimapWidth = minimapMaxSize;
-      minimapHeight = minimapMaxSize / aspectRatio;
-    } else {
-      // Height is larger or square
-      minimapWidth = minimapMaxSize * aspectRatio;
-      minimapHeight = minimapMaxSize;
-    }
-
-    const cellSizeX = minimapWidth / gridWidth;
-    const cellSizeY = minimapHeight / gridHeight;
-
-    const cache = document.createElement('canvas');
-    cache.width = minimapWidth;
-    cache.height = minimapHeight;
-    const ctx = cache.getContext('2d');
-    if (!ctx) return;
-
-    // Draw minimap background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.fillRect(0, 0, minimapWidth, minimapHeight);
-
-    // Draw grid cells
-    for (let row = 0; row < gridHeight; row++) {
-      for (let col = 0; col < gridWidth; col++) {
-        const node = manager.getNode(row, col);
-        if (!node) continue;
-
-        const x = col * cellSizeX;
-        const y = row * cellSizeY;
-
-        if (node.state === PathOption.WALL) {
-          ctx.fillStyle = '#666';
-        } else if (node.state === PathOption.START) {
-          ctx.fillStyle = '#00f';
-        } else if (node.state === PathOption.END) {
-          ctx.fillStyle = '#0f0';
-        } else {
-          ctx.fillStyle = '#222';
-        }
-
-        ctx.fillRect(x, y, cellSizeX, cellSizeY);
-      }
-    }
-
-    minimapCacheRef.current = cache;
-  }, [manager, gridWidth, gridHeight]);
-
-  // Render the 3D view
+  // Unified render loop: update player + render canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const raycaster = raycasterRef.current;
@@ -211,63 +151,18 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     if (!ctx) return;
 
     let isActive = true;
+    let lastFrameTime = performance.now();
 
     // Fixed resolution scale for consistent performance
     const resolutionScale = 0.5;
 
-    const drawMinimap = (ctx: CanvasRenderingContext2D) => {
-      const minimapX = 10;
-      const minimapY = 10;
-
-      // Draw cached minimap
-      if (!minimapCacheRef.current) return;
-
-      const minimapWidth = minimapCacheRef.current.width;
-      const minimapHeight = minimapCacheRef.current.height;
-
-      ctx.drawImage(minimapCacheRef.current, minimapX, minimapY);
-
-      // Calculate cell sizes
-      const cellSizeX = minimapWidth / gridWidth;
-      const cellSizeY = minimapHeight / gridHeight;
-
-      // Draw player position
-      const playerMinimapX = minimapX + player.x * cellSizeX;
-      const playerMinimapY = minimapY + player.y * cellSizeY;
-
-      ctx.fillStyle = '#ff0';
-      ctx.beginPath();
-      ctx.arc(playerMinimapX, playerMinimapY, 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Draw player direction
-      const dirLength = 8;
-      const dirX = Math.cos(player.angle) * dirLength;
-      const dirY = Math.sin(player.angle) * dirLength;
-
-      ctx.strokeStyle = '#ff0';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(playerMinimapX, playerMinimapY);
-      ctx.lineTo(playerMinimapX + dirX, playerMinimapY + dirY);
-      ctx.stroke();
-    };
-
-    const drawControls = (ctx: CanvasRenderingContext2D, screenHeight: number) => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      ctx.fillRect(10, screenHeight - 105, 280, 95);
-
-      ctx.fillStyle = '#fff';
-      ctx.font = '14px monospace';
-      ctx.fillText('Controls:', 20, screenHeight - 80);
-      ctx.fillText('W/Z/↑: Move Forward', 20, screenHeight - 60);
-      ctx.fillText('S/↓: Move Backward', 20, screenHeight - 45);
-      ctx.fillText('Q/A: Strafe Left', 20, screenHeight - 30);
-      ctx.fillText('D: Strafe Right', 20, screenHeight - 15);
-    };
-
-    const render = () => {
+    const render = (currentTime: number) => {
       if (!isActive) return;
+
+      // Calculate delta time and update player
+      const deltaTime = (currentTime - lastFrameTime) / 1000;
+      lastFrameTime = currentTime;
+      updatePlayer(deltaTime);
 
       const width = canvas.width;
       const height = canvas.height;
@@ -293,8 +188,9 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
         ctx.fillRect(0, i, width, 1);
       }
 
-      // Cast rays at reduced resolution
-      const rays = raycaster.castAllRays(player, renderWidth);
+      // Cast rays at reduced resolution (use current player state from ref)
+      const currentPlayer = playerRef.current;
+      const rays = raycaster.castAllRays(currentPlayer, renderWidth);
 
       // Draw walls with scaling
       const scale = width / renderWidth;
@@ -331,10 +227,10 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
       });
 
       // Draw minimap
-      drawMinimap(ctx);
+      drawMinimap(ctx, currentPlayer);
 
       // Draw controls
-      drawControls(ctx, height);
+      drawControlsPanel(ctx, height);
 
       animationFrameRef.current = requestAnimationFrame(render);
     };
@@ -348,25 +244,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
         animationFrameRef.current = null;
       }
     };
-  }, [player, gridWidth, gridHeight, manager]);
-
-  // Handle canvas resize
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const resize = () => {
-      canvas.width = globalThis.innerWidth;
-      canvas.height = globalThis.innerHeight;
-    };
-
-    resize();
-    globalThis.addEventListener('resize', resize);
-
-    return () => {
-      globalThis.removeEventListener('resize', resize);
-    };
-  }, []);
+  }, [updatePlayer, drawMinimap, drawControlsPanel]);
 
   // Reset player position when start node changes (only when start node actually changes)
   useEffect(() => {
@@ -404,34 +282,4 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to blend two hex colors
-function blendColors(color1: string, color2: string, ratio: number): string {
-  const r1 = Number.parseInt(color1.substring(1, 3), 16);
-  const g1 = Number.parseInt(color1.substring(3, 5), 16);
-  const b1 = Number.parseInt(color1.substring(5, 7), 16);
-
-  const r2 = Number.parseInt(color2.substring(1, 3), 16);
-  const g2 = Number.parseInt(color2.substring(3, 5), 16);
-  const b2 = Number.parseInt(color2.substring(5, 7), 16);
-
-  const r = Math.round(r1 + (r2 - r1) * ratio);
-  const g = Math.round(g1 + (g2 - g1) * ratio);
-  const b = Math.round(b1 + (b2 - b1) * ratio);
-
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-}
-
-// Helper function to adjust brightness
-function adjustBrightness(color: string, factor: number): string {
-  const r = Number.parseInt(color.substring(1, 3), 16);
-  const g = Number.parseInt(color.substring(3, 5), 16);
-  const b = Number.parseInt(color.substring(5, 7), 16);
-
-  const newR = Math.round(Math.min(255, r * factor));
-  const newG = Math.round(Math.min(255, g * factor));
-  const newB = Math.round(Math.min(255, b * factor));
-
-  return `#${((1 << 24) + (newR << 16) + (newG << 8) + newB).toString(16).slice(1)}`;
 }
