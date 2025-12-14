@@ -7,11 +7,14 @@ interface LabeledSliderProps {
   value: number;
   min: number;
   max: number;
+  step?: number;
   onValueChange: (value: number) => void;
+  formatValue?: (value: number) => string;
 }
 
-export function LabeledSlider({ label, value, min, max, onValueChange }: LabeledSliderProps) {
+export function LabeledSlider({ label, value, min, max, step, onValueChange, formatValue }: LabeledSliderProps) {
   const id = useId();
+  const displayValue = formatValue ? formatValue(value) : value;
 
   return (
     <div className='space-y-2'>
@@ -19,9 +22,9 @@ export function LabeledSlider({ label, value, min, max, onValueChange }: Labeled
         <Label htmlFor={id} className='text-sm'>
           {label}
         </Label>
-        <span className='text-sm font-medium text-white'>{value}</span>
+        <span className='text-sm font-medium text-white'>{displayValue}</span>
       </div>
-      <Slider id={id} min={min} max={max} value={[value]} onValueChange={(values) => onValueChange(values[0])} />
+      <Slider id={id} min={min} max={max} step={step} value={[value]} onValueChange={(values) => onValueChange(values[0])} />
     </div>
   );
 }

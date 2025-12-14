@@ -45,6 +45,9 @@ interface GridStore {
   isCalculating: boolean;
   executionTime: number;
 
+  // Animation settings
+  animationSpeed: number; // milliseconds delay per step (0 = instant, higher = slower)
+
   // Grid change tracking (increments when walls/start/end change, not for visited/solution)
   gridVersion: number;
 
@@ -59,6 +62,7 @@ interface GridStore {
   setShowCellBorders: (show: boolean) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   setExecutionTime: (time: number) => void;
+  setAnimationSpeed: (speed: number) => void;
   generateMazeAnimatedTrigger: number; // Trigger counter for animated maze generation
   triggerAnimatedMaze: () => void;
   incrementGridVersion: () => void;
@@ -80,6 +84,7 @@ export const useGridStore = create<GridStore>((set) => ({
   showCellBorders: true,
   isCalculating: false,
   executionTime: 0,
+  animationSpeed: 30,
   gridVersion: 0,
   generateMazeAnimatedTrigger: 0,
 
@@ -102,6 +107,7 @@ export const useGridStore = create<GridStore>((set) => ({
   setShowCellBorders: (show) => set({ showCellBorders: show }),
   setIsCalculating: (isCalculating) => set({ isCalculating }),
   setExecutionTime: (time) => set({ executionTime: time }),
+  setAnimationSpeed: (speed) => set({ animationSpeed: speed }),
 
   triggerAnimatedMaze: () =>
     set((store) => ({

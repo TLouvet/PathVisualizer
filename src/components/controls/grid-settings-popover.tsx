@@ -13,6 +13,8 @@ interface GridSettingsPopoverProps {
   onShowVisitedNodesChange: (show: boolean) => void;
   showCellBorders: boolean;
   onShowCellBordersChange: (show: boolean) => void;
+  animationSpeed: number;
+  onAnimationSpeedChange: (speed: number) => void;
 }
 
 export function GridSettingsPopover({
@@ -23,6 +25,8 @@ export function GridSettingsPopover({
   onShowVisitedNodesChange,
   showCellBorders,
   onShowCellBordersChange,
+  animationSpeed,
+  onAnimationSpeedChange,
 }: GridSettingsPopoverProps) {
   return (
     <Popover>
@@ -51,6 +55,18 @@ export function GridSettingsPopover({
               max={60}
               onValueChange={(value) => onGridSizeChange(gridWidth, value)}
             />
+
+            <div className='pt-2 border-t'>
+              <LabeledSlider
+                label='Animation Speed (ms)'
+                value={animationSpeed}
+                min={0}
+                max={500}
+                step={10}
+                onValueChange={onAnimationSpeedChange}
+                formatValue={(value) => (value === 0 ? 'Instant' : `${value}ms`)}
+              />
+            </div>
 
             <div className='flex items-center space-x-2 pt-2'>
               <Checkbox id='show-visited' checked={showVisitedNodes} onCheckedChange={onShowVisitedNodesChange} />

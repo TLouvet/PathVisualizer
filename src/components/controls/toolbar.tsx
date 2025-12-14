@@ -35,6 +35,8 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
     setShowVisitedNodes,
     showCellBorders,
     setShowCellBorders,
+    animationSpeed,
+    setAnimationSpeed,
     triggerAnimatedMaze,
     executionTime,
     isCalculating,
@@ -87,6 +89,8 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
               onShowVisitedNodesChange={setShowVisitedNodes}
               showCellBorders={showCellBorders}
               onShowCellBordersChange={setShowCellBorders}
+              animationSpeed={animationSpeed}
+              onAnimationSpeedChange={setAnimationSpeed}
             />
 
             {/* Drawing Tools */}

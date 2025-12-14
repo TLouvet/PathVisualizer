@@ -31,14 +31,11 @@ export function usePathfindingCanvas() {
       visited: GridNodeData[],
       path: GridNodeData[],
       signal: AbortSignal,
-      gridSize: number,
       manager: CanvasGridManager,
       shouldShowVisited: boolean,
       pathFromStart?: GridNodeData[],
       pathFromEnd?: GridNodeData[]
     ) => {
-      const THROTTLE_INTERVAL = 10 + Math.floor(gridSize / 100); // Update animation every N nodes
-
       // Animate visited nodes only if enabled
       if (shouldShowVisited) {
         for (let i = 0; i < visited.length; i++) {
@@ -48,9 +45,14 @@ export function usePathfindingCanvas() {
           if (node.state !== PathOption.START && node.state !== PathOption.END) {
             manager.updateNodeState(node.row, node.col, PathOption.VISITED);
 
-            // Throttle animation for visual effect
-            if (i % THROTTLE_INTERVAL === 0) {
-              await new Promise((resolve) => requestAnimationFrame(resolve));
+            // Read animation speed from store for real-time reactivity
+            const currentSpeed = useGridStore.getState().animationSpeed;
+            const batchSize =
+              currentSpeed === 0 ? visited.length : Math.max(1, Math.ceil(20 / Math.max(currentSpeed, 1)));
+
+            // Add delay based on current animation speed
+            if (currentSpeed > 0 && i % batchSize === 0) {
+              await new Promise((resolve) => setTimeout(resolve, currentSpeed));
             }
           }
         }
@@ -80,7 +82,11 @@ export function usePathfindingCanvas() {
             }
           }
 
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          // Read current speed for real-time reactivity
+          const currentSpeed = useGridStore.getState().animationSpeed;
+          if (currentSpeed > 0) {
+            await new Promise((resolve) => setTimeout(resolve, currentSpeed));
+          }
         }
       } else {
         // Regular path rendering
@@ -90,7 +96,12 @@ export function usePathfindingCanvas() {
           const node = path[i];
           if (node.state !== PathOption.START && node.state !== PathOption.END) {
             manager.updateNodeState(node.row, node.col, PathOption.SOLUTION);
-            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            // Read current speed for real-time reactivity
+            const currentSpeed = useGridStore.getState().animationSpeed;
+            if (currentSpeed > 0) {
+              await new Promise((resolve) => setTimeout(resolve, currentSpeed));
+            }
           }
         }
       }
@@ -123,7 +134,6 @@ export function usePathfindingCanvas() {
 
     // Get current grid state and create a deep copy for the algorithm
     const grid = manager.getGridCopy();
-    const gridSize = grid.length * (grid[0]?.length || 0);
 
     const start = grid[startNode.row][startNode.col];
     const end = grid[endNode.row][endNode.col];
@@ -214,7 +224,6 @@ export function usePathfindingCanvas() {
       result.visited,
       result.path,
       signal,
-      gridSize,
       manager,
       showVisitedNodes,
       result.pathFromStart,
