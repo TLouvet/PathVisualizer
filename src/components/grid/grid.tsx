@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useGridStore } from '../../store/grid-store';
 import { PathOption } from '../../types/grid-node';
 import { usePathfindingCanvas } from '../../hooks/usePathfindingCanvas';
@@ -12,10 +12,14 @@ const Grid = () => {
   const isDrawing = useGridStore((state) => state.isDrawing);
   const setIsDrawing = useGridStore((state) => state.setIsDrawing);
   const gridVersion = useGridStore((state) => state.gridVersion);
+  const incrementGridVersion = useGridStore((state) => state.incrementGridVersion);
   const generateMazeAnimatedTrigger = useGridStore((state) => state.generateMazeAnimatedTrigger);
   const { manager } = useCanvasGridManager();
   const { runAlgorithm } = usePathfindingCanvas();
   const { generateMazeAnimated } = useMazeGeneration();
+
+  // Track if we modified the path during drawing session
+  const modifiedPathDuringDraw = useRef(false);
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -30,10 +34,23 @@ const Grid = () => {
         }
       } else {
         // For walls and other states
+        const node = manager.getNode(row, col);
+        const wasPartOfPath = node?.state === PathOption.SOLUTION || node?.state === PathOption.VISITED;
+
         manager.updateNodeState(row, col, currentTool);
+
+        // Track if we modified the path - recalculation happens on mouse up if drawing
+        if (currentTool === PathOption.WALL && wasPartOfPath && manager.startNode && manager.endNode) {
+          if (isDrawing) {
+            modifiedPathDuringDraw.current = true;
+          } else {
+            // Single click - trigger immediately
+            incrementGridVersion();
+          }
+        }
       }
     },
-    [manager, currentTool, runAlgorithm]
+    [manager, currentTool, runAlgorithm, incrementGridVersion, isDrawing]
   );
 
   // Run algorithm when grid structure changes (walls, start, end)
@@ -66,7 +83,14 @@ const Grid = () => {
       // Don't overwrite start/end nodes when dragging
       if (node?.state === PathOption.START || node?.state === PathOption.END) return;
 
+      const wasPartOfPath = node?.state === PathOption.SOLUTION || node?.state === PathOption.VISITED;
+
       manager.updateNodeState(row, col, currentTool);
+
+      // Track if we modified the path during this drawing session
+      if (currentTool === PathOption.WALL && wasPartOfPath && manager.startNode && manager.endNode) {
+        modifiedPathDuringDraw.current = true;
+      }
     },
     [manager, isDrawing, currentTool]
   );
@@ -77,13 +101,25 @@ const Grid = () => {
 
   const handleMouseUp = useCallback(() => {
     setIsDrawing(false);
-  }, [setIsDrawing]);
+
+    // Trigger recalculation if we modified the path during drawing
+    if (modifiedPathDuringDraw.current) {
+      incrementGridVersion();
+      modifiedPathDuringDraw.current = false;
+    }
+  }, [setIsDrawing, incrementGridVersion]);
 
   const handleMouseLeave = useCallback(() => {
     if (isDrawing) {
       setIsDrawing(false);
+
+      // Trigger recalculation if we modified the path during drawing
+      if (modifiedPathDuringDraw.current) {
+        incrementGridVersion();
+        modifiedPathDuringDraw.current = false;
+      }
     }
-  }, [isDrawing, setIsDrawing]);
+  }, [isDrawing, setIsDrawing, incrementGridVersion]);
 
   return (
     <div

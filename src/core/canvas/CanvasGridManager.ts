@@ -163,6 +163,34 @@ export class CanvasGridManager {
     }
   }
 
+  public batchUpdateNodeStates(updates: Array<{ row: number; col: number; state: PathOption }>) {
+    const now = performance.now();
+    let hasChanges = false;
+
+    for (const { row, col, state } of updates) {
+      const node = this.getNode(row, col);
+      if (!node) continue;
+
+      const key = `${row},${col}`;
+      const oldState = node.state;
+
+      node.state = state;
+
+      // Record animation start time if state changed
+      if (oldState !== state) {
+        this.nodeAnimations.set(key, {
+          animationStartTime: now,
+        });
+        hasChanges = true;
+      }
+    }
+
+    // Only mark dirty once for all updates
+    if (hasChanges) {
+      this.markDirty();
+    }
+  }
+
   public placeNode(row: number, col: number, state: PathOption) {
     const node = this.getNode(row, col);
     if (!node) return;

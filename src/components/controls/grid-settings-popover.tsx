@@ -36,7 +36,7 @@ export function GridSettingsPopover({
               label='Width'
               value={gridWidth}
               min={10}
-              max={150}
+              max={120}
               onValueChange={(value) => onGridSizeChange(value, gridHeight)}
             />
 

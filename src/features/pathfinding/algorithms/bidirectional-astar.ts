@@ -53,7 +53,6 @@ export class BidirectionalAStarAlgorithm {
           closedFromStart,
           closedFromEnd,
           gScoresFromStart,
-          gScoresFromEnd,
           getAdjacentNodes,
           heuristic,
           end,
@@ -77,7 +76,6 @@ export class BidirectionalAStarAlgorithm {
           closedFromEnd,
           closedFromStart,
           gScoresFromEnd,
-          gScoresFromStart,
           getAdjacentNodes,
           heuristic,
           start,
@@ -121,7 +119,6 @@ export class BidirectionalAStarAlgorithm {
     closedFromThis: Map<string, AStarNode>,
     closedFromOther: Map<string, AStarNode>,
     gScoresFromThis: Map<string, number>,
-    gScoresFromOther: Map<string, number>,
     getAdjacentNodes: (node: GridNodeData) => GridNodeData[],
     heuristic: (a: GridNodeData, b: GridNodeData) => number,
     goal: GridNodeData,
@@ -185,7 +182,7 @@ export class BidirectionalAStarAlgorithm {
         f,
       };
 
-      // Check if meeting with other frontier
+      // Check if meeting with other frontier (in closed set)
       const otherNodeAtKey = closedFromOther.get(nodeKey);
       if (otherNodeAtKey) {
         const pathLength = astarNode.g + otherNodeAtKey.g;
@@ -198,6 +195,7 @@ export class BidirectionalAStarAlgorithm {
           };
         }
       }
+
 
       // Remove old node with worse g-score if it exists
       const existingIndex = openList.findIndex((n) => n.row === node.row && n.col === node.col);

@@ -75,8 +75,9 @@ export function useMazeGeneration() {
     });
 
     const totalNodes = gridWidth * gridHeight;
-    const THROTTLE_INTERVAL = totalNodes > 800 ? 30 : 20;
+    const THROTTLE_INTERVAL = 10 + Math.floor(totalNodes / 50);
     let stepCount = 0;
+    let pendingUpdates: { row: number; col: number }[] = [];
 
     // Animate the maze generation
     for (const step of generator) {
@@ -85,7 +86,7 @@ export function useMazeGeneration() {
         return;
       }
 
-      // Carve out cells
+      // Collect cells to carve
       step.cellsToCarve.forEach(({ row, col }) => {
         // Don't overwrite start/end nodes
         if (
@@ -95,14 +96,26 @@ export function useMazeGeneration() {
           return;
         }
 
-        manager.updateNodeState(row, col, PathOption.NONE);
+        pendingUpdates.push({ row, col });
       });
 
-      // Throttle animation for visual effect
+      // Batch updates and throttle animation for visual effect
       stepCount++;
       if (stepCount % THROTTLE_INTERVAL === 0) {
+        // Apply all pending updates in a single batch
+        manager.batchUpdateNodeStates(
+          pendingUpdates.map(({ row, col }) => ({ row, col, state: PathOption.NONE }))
+        );
+        pendingUpdates = [];
         await new Promise((resolve) => requestAnimationFrame(resolve));
       }
+    }
+
+    // Apply any remaining updates
+    if (pendingUpdates.length > 0) {
+      manager.batchUpdateNodeStates(
+        pendingUpdates.map(({ row, col }) => ({ row, col, state: PathOption.NONE }))
+      );
     }
 
     setIsCalculating(false);

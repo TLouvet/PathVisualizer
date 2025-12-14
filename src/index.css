@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Orbitron';
+  src: url('/Orbitron-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   font-family: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
@@ -213,6 +221,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
+  font-family: 'Orbitron', sans-serif;
   font-size: 2.5em;
   line-height: 1.2;
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
