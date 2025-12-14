@@ -38,6 +38,7 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
     isCalculating,
     startNode,
     endNode,
+    incrementGridVersion,
   } = useGridStore();
 
   const { manager } = useCanvasGridManager();
@@ -47,6 +48,7 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
   const handleResetGrid = () => {
     if (manager) {
       manager.resetGrid();
+      incrementGridVersion(); // Abort any ongoing algorithm visualization
     }
   };
 
