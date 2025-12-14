@@ -1,4 +1,7 @@
-import { type GridNodeData } from '../../types/grid-node';
+import type { GridNodeData } from '@/types/grid-node';
+import { PathBuilder } from './path-builder';
+import { isTargetNode } from './helpers';
+import type { Distance2DStrategy } from '@/core/distance/distance-2d.strategy';
 
 export class GreedyDFSAlgorithm {
   private visitedNodes: GridNodeData[] = [];
@@ -8,12 +11,12 @@ export class GreedyDFSAlgorithm {
     start: GridNodeData,
     end: GridNodeData,
     getAdjacentNodes: (node: GridNodeData) => GridNodeData[],
-    getDistance: (a: GridNodeData, b: GridNodeData) => number
+    distanceStrategy: Distance2DStrategy
   ): { visited: GridNodeData[]; path: GridNodeData[]; found: boolean } {
     this.visitedNodes = [];
     this.solutionPath = [];
 
-    const found = this.dfs(start, end, getAdjacentNodes, getDistance);
+    const found = this.dfs(start, end, getAdjacentNodes, distanceStrategy);
 
     return {
       visited: this.visitedNodes,
@@ -26,15 +29,10 @@ export class GreedyDFSAlgorithm {
     current: GridNodeData,
     end: GridNodeData,
     getAdjacentNodes: (node: GridNodeData) => GridNodeData[],
-    getDistance: (a: GridNodeData, b: GridNodeData) => number
+    distanceStrategy: Distance2DStrategy
   ): boolean {
-    if (current.row === end.row && current.col === end.col) {
-      // Build solution path
-      let node: GridNodeData | null = current;
-      while (node) {
-        this.solutionPath.unshift(node);
-        node = node.parent;
-      }
+    if (isTargetNode(current, end)) {
+      this.solutionPath = PathBuilder.buildPath(current);
       return true;
     }
 
@@ -44,7 +42,7 @@ export class GreedyDFSAlgorithm {
     const sortedNodes = adjacentNodes
       .map((node) => ({
         node,
-        distance: getDistance(node, end),
+        distance: distanceStrategy.calculate(node, end),
         random: Math.random(),
       }))
       .sort((a, b) => {
@@ -62,7 +60,7 @@ export class GreedyDFSAlgorithm {
         node.parent = current;
         this.visitedNodes.push(node);
 
-        if (this.dfs(node, end, getAdjacentNodes, getDistance)) {
+        if (this.dfs(node, end, getAdjacentNodes, distanceStrategy)) {
           return true;
         }
       }

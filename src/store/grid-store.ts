@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { type GridNodeData, PathOption } from '../types/grid-node';
-import { AlgorithmType, DirectionType } from '../types/algorithm';
+import { AlgorithmType, DirectionType } from '../features/pathfinding/types/algorithm';
 import { MazeAlgorithm } from '../features/maze/types/maze';
 
 // Determine initial grid size based on device

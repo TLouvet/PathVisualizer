@@ -4,8 +4,8 @@ import { Header } from './components/layout/header';
 import { Toolbar } from './components/controls/toolbar';
 import { LandscapePrompt } from './components/layout/landscape-prompt';
 import { CanvasGridProvider } from './contexts/CanvasGridContext';
-import { useOrientation } from './hooks/useOrientation';
-import { useIsMobile } from './hooks/useIsMobile';
+import { useOrientation } from './shared/hooks/use-orientation';
+import { useIsMobile } from './shared/hooks/use-is-mobile';
 import { MazeView3D } from './components/grid/MazeView3D';
 
 function App() {

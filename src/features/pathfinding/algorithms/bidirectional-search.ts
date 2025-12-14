@@ -1,4 +1,5 @@
-import { type GridNodeData } from '../../types/grid-node';
+import type { GridNodeData } from '@/types/grid-node';
+import { PathBuilder } from './path-builder';
 
 export class BidirectionalSearchAlgorithm {
   solve(
@@ -26,8 +27,8 @@ export class BidirectionalSearchAlgorithm {
     const visitedFromStart = new Map<string, GridNodeData>();
     const visitedFromEnd = new Map<string, GridNodeData>();
 
-    visitedFromStart.set(`${start.row},${start.col}`, startCopy);
-    visitedFromEnd.set(`${end.row},${end.col}`, endCopy);
+    visitedFromStart.set(`${start.row}-${start.col}`, startCopy);
+    visitedFromEnd.set(`${end.row}-${end.col}`, endCopy);
 
     while (queueFromStart.length > 0 || queueFromEnd.length > 0) {
       // Expand from start side
@@ -75,7 +76,7 @@ export class BidirectionalSearchAlgorithm {
     const adjacentNodes = getAdjacentNodes(current);
 
     for (const node of adjacentNodes) {
-      const nodeKey = `${node.row},${node.col}`;
+      const nodeKey = `${node.row}-${node.col}`;
 
       // Check if we've met the other search frontier
       if (visitedFromOther.has(nodeKey)) {
@@ -111,19 +112,14 @@ export class BidirectionalSearchAlgorithm {
     found: boolean;
   } {
     const path: GridNodeData[] = [];
-    const meetingKey = `${meetingPoint.row},${meetingPoint.col}`;
+    const meetingKey = `${meetingPoint.row}-${meetingPoint.col}`;
 
     // Build path from start to meeting point
-    let nodeFromStart: GridNodeData | null = visitedFromStart.get(meetingKey) || null;
-    const pathFromStart: GridNodeData[] = [];
-
-    while (nodeFromStart) {
-      pathFromStart.unshift(nodeFromStart);
-      nodeFromStart = nodeFromStart.parent;
-    }
+    const nodeFromStart = visitedFromStart.get(meetingKey);
+    const pathFromStart = nodeFromStart ? PathBuilder.buildPath(nodeFromStart) : [];
 
     // Build path from meeting point to end (reverse direction)
-    let nodeFromEnd: GridNodeData | null = visitedFromEnd.get(meetingKey) || null;
+    const nodeFromEnd = visitedFromEnd.get(meetingKey);
     const pathToEnd: GridNodeData[] = [];
 
     if (nodeFromEnd && nodeFromEnd.parent) {

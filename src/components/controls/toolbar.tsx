@@ -1,6 +1,6 @@
 import { useGridStore } from '@/store/grid-store';
 import { PathOption } from '@/types/grid-node';
-import { AlgorithmType, DirectionType } from '@/types/algorithm';
+import { AlgorithmType, DirectionType } from '@/features/pathfinding/types/algorithm';
 import { MazeAlgorithm } from '@/features/maze/types/maze';
 import { Button } from '@/shared/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-group';
@@ -9,9 +9,10 @@ import { Separator } from '@/shared/components/ui/separator';
 import { RotateCcw, Activity, Sparkles, Box } from 'lucide-react';
 import { CustomSelect } from './custom-select';
 import { GridSettingsPopover } from './grid-settings-popover';
-import { algorithmOptions, mazeAlgorithmOptions, directionOptions } from '@/config/algorithm-labels';
+import { algorithmOptions, directionOptions } from '@/features/pathfinding/config/algorithm-labels';
+import { mazeAlgorithmOptions } from '@/features/maze/config/algorithm-labels';
 import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
-import { useIsMobile } from '@/hooks/useIsMobile';
+import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
 interface ToolbarProps {
   onShow3DView?: () => void;

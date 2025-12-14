@@ -1,4 +1,4 @@
-import { type GridNodeData } from './grid-node';
+import type { GridNodeData } from '@/types/grid-node';
 
 export const AlgorithmType = {
   DFS: 'dfs',
@@ -11,14 +11,14 @@ export const AlgorithmType = {
   JPS: 'jps',
 } as const;
 
-export type AlgorithmType = typeof AlgorithmType[keyof typeof AlgorithmType];
+export type AlgorithmType = (typeof AlgorithmType)[keyof typeof AlgorithmType];
 
 export const DirectionType = {
   FOUR: 4,
   EIGHT: 8,
 } as const;
 
-export type DirectionType = typeof DirectionType[keyof typeof DirectionType];
+export type DirectionType = (typeof DirectionType)[keyof typeof DirectionType];
 
 export interface AlgorithmResult {
   path: GridNodeData[];

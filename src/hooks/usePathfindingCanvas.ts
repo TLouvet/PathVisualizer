@@ -1,30 +1,28 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useGridStore } from '../store/grid-store';
-import { AlgorithmType, DirectionType } from '../types/algorithm';
+import { AlgorithmType, DirectionType } from '../features/pathfinding/types/algorithm';
 import { type GridNodeData, PathOption } from '../types/grid-node';
-import { DFSAlgorithm } from '../core/algorithms/dfs';
-import { GreedyDFSAlgorithm } from '../core/algorithms/greedy-dfs';
-import { BFSAlgorithm } from '../core/algorithms/bfs';
-import { GreedyBestFirstAlgorithm } from '../core/algorithms/greedy-best-first';
-import { BidirectionalSearchAlgorithm } from '../core/algorithms/bidirectional-search';
-import { DijkstraAlgorithm } from '../core/algorithms/dijkstra';
-import { AStarAlgorithm } from '../core/algorithms/astar';
-import { JumpPointSearchAlgorithm } from '../core/algorithms/jump-point-search';
-import {
-  getAdjacentNodes4Direction,
-  getAdjacentNodes8Direction,
-  getManhattanDistance,
-  getEuclidianDistance,
-} from '../core/algorithms/helpers';
+import { DFSAlgorithm } from '../features/pathfinding/algorithms/dfs';
+import { GreedyDFSAlgorithm } from '../features/pathfinding/algorithms/greedy-dfs';
+import { BFSAlgorithm } from '../features/pathfinding/algorithms/bfs';
+import { GreedyBestFirstAlgorithm } from '../features/pathfinding/algorithms/greedy-best-first';
+import { BidirectionalSearchAlgorithm } from '../features/pathfinding/algorithms/bidirectional-search';
+import { DijkstraAlgorithm } from '../features/pathfinding/algorithms/dijkstra';
+import { AStarAlgorithm } from '../features/pathfinding/algorithms/astar';
+import { JumpPointSearchAlgorithm } from '../features/pathfinding/algorithms/jump-point-search';
+import { getAdjacentNodes4Direction, getAdjacentNodes8Direction } from '../features/pathfinding/algorithms/helpers';
 import type { CanvasGridManager } from '../core/canvas/CanvasGridManager';
 import { useCanvasGridManager } from '../contexts/CanvasGridContext';
+import { ManhattanDistance } from '../core/distance/manhattan-distance';
+import { EuclidianDistance } from '../core/distance/euclidian-distance';
+import { useAbortController } from '../shared/hooks/use-abort-controller';
 
 export function usePathfindingCanvas() {
   const { selectedAlgorithm, selectedDirection, gridVersion, setIsCalculating, setExecutionTime } = useGridStore();
   const { manager } = useCanvasGridManager();
 
   // AbortController to cancel ongoing animations
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const { createController } = useAbortController([gridVersion]);
 
   const visualizePath = useCallback(
     async (
@@ -109,14 +107,9 @@ export function usePathfindingCanvas() {
       return;
     }
 
-    // Cancel any ongoing animation
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new AbortController for this run
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
+    // Create new AbortController for this run (auto-aborts previous)
+    const controller = createController();
+    const signal = controller.signal;
 
     setIsCalculating(true);
     manager.clearPathVisualization();
@@ -136,8 +129,9 @@ export function usePathfindingCanvas() {
         ? (node: GridNodeData) => getAdjacentNodes4Direction(grid, node)
         : (node: GridNodeData) => getAdjacentNodes8Direction(grid, node);
 
-    // Select distance function
-    const getDistance = selectedDirection === DirectionType.FOUR ? getManhattanDistance : getEuclidianDistance;
+    // Select distance strategy
+    const distanceStrategy =
+      selectedDirection === DirectionType.FOUR ? new ManhattanDistance() : new EuclidianDistance();
 
     let result: {
       visited: GridNodeData[];
@@ -157,7 +151,7 @@ export function usePathfindingCanvas() {
 
       case AlgorithmType.GREEDY_DFS: {
         const greedyDfs = new GreedyDFSAlgorithm();
-        result = greedyDfs.solve(start, end, getAdjacentNodes, getDistance);
+        result = greedyDfs.solve(start, end, getAdjacentNodes, distanceStrategy);
         break;
       }
 
@@ -169,7 +163,7 @@ export function usePathfindingCanvas() {
 
       case AlgorithmType.GREEDY_BFS: {
         const greedyBfs = new GreedyBestFirstAlgorithm();
-        result = greedyBfs.solve(start, end, getAdjacentNodes, getDistance);
+        result = greedyBfs.solve(start, end, getAdjacentNodes, distanceStrategy);
         break;
       }
 
@@ -181,19 +175,19 @@ export function usePathfindingCanvas() {
 
       case AlgorithmType.DIJKSTRA: {
         const dijkstra = new DijkstraAlgorithm();
-        result = dijkstra.solve(start, end, getAdjacentNodes, getDistance);
+        result = dijkstra.solve(start, end, getAdjacentNodes, distanceStrategy);
         break;
       }
 
       case AlgorithmType.ASTAR: {
         const astar = new AStarAlgorithm();
-        result = astar.solve(start, end, getAdjacentNodes, getDistance);
+        result = astar.solve(start, end, getAdjacentNodes, distanceStrategy);
         break;
       }
 
       case AlgorithmType.JPS: {
         const jps = new JumpPointSearchAlgorithm();
-        result = jps.solve(grid, start, end, getDistance);
+        result = jps.solve(grid, start, end, distanceStrategy);
         break;
       }
 
@@ -220,14 +214,15 @@ export function usePathfindingCanvas() {
     }
 
     setIsCalculating(false);
-  }, [manager, selectedAlgorithm, selectedDirection, visualizePath, setIsCalculating, setExecutionTime]);
-
-  // Abort ongoing animation when grid structure changes
-  useEffect(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-  }, [gridVersion]);
+  }, [
+    manager,
+    selectedAlgorithm,
+    selectedDirection,
+    visualizePath,
+    setIsCalculating,
+    setExecutionTime,
+    createController,
+  ]);
 
   // Auto-run when algorithm or direction changes
   useEffect(() => {
@@ -236,15 +231,6 @@ export function usePathfindingCanvas() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAlgorithm, selectedDirection]);
-
-  // Cancel animation when component unmounts
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
 
   return { runAlgorithm };
 }

@@ -39,6 +39,13 @@ export class CanvasGridManager {
   public startNode: GridNodeData | null = null;
   public endNode: GridNodeData | null = null;
 
+  // Viewport culling
+  private renderRadius: number | null = null; // null = render all, number = render within radius
+  private focalPoint: { row: number; col: number } | null = null;
+
+  // Render control
+  private isPaused: boolean = false;
+
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
@@ -219,6 +226,51 @@ export class CanvasGridManager {
     } else {
       this.hoveredCell = { row, col };
     }
+  }
+
+  /**
+   * Enable viewport culling to only render cells within a radius of a focal point
+   * @param radius - Number of cells to render around the focal point (null = render all)
+   * @param focalPoint - Center point for rendering (defaults to grid center if not set)
+   */
+  public setRenderRadius(radius: number | null, focalPoint?: { row: number; col: number }) {
+    this.renderRadius = radius;
+    if (focalPoint) {
+      this.focalPoint = focalPoint;
+    } else if (radius !== null) {
+      // Default to center of grid
+      this.focalPoint = {
+        row: Math.floor(this.height / 2),
+        col: Math.floor(this.width / 2),
+      };
+    }
+  }
+
+  /**
+   * Update the focal point for viewport culling (e.g., follow player position)
+   */
+  public setFocalPoint(row: number, col: number) {
+    this.focalPoint = { row, col };
+  }
+
+  /**
+   * Pause the render loop (e.g., when canvas is hidden)
+   */
+  public pause() {
+    this.isPaused = true;
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
+    }
+  }
+
+  /**
+   * Resume the render loop
+   */
+  public resume() {
+    if (!this.isPaused) return;
+    this.isPaused = false;
+    this.startRenderLoop();
   }
 
   private drawCell(node: GridNodeData, timestamp: number) {
@@ -414,13 +466,35 @@ export class CanvasGridManager {
   }
 
   private render = (timestamp: number) => {
-    // Clear canvas
-    this.ctx.fillStyle = COLORS.background;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Stop if paused
+    if (this.isPaused) return;
 
-    // Draw all cells
-    for (let row = 0; row < this.height; row++) {
-      for (let col = 0; col < this.width; col++) {
+    // Determine render bounds
+    let startRow = 0;
+    let endRow = this.height;
+    let startCol = 0;
+    let endCol = this.width;
+
+    if (this.renderRadius !== null && this.focalPoint) {
+      // Calculate visible area based on focal point and radius
+      startRow = Math.max(0, this.focalPoint.row - this.renderRadius);
+      endRow = Math.min(this.height, this.focalPoint.row + this.renderRadius + 1);
+      startCol = Math.max(0, this.focalPoint.col - this.renderRadius);
+      endCol = Math.min(this.width, this.focalPoint.col + this.renderRadius + 1);
+    }
+
+    // Clear only the visible area
+    const clearX = startCol * this.cellWidth;
+    const clearY = startRow * this.cellHeight;
+    const clearWidth = (endCol - startCol) * this.cellWidth;
+    const clearHeight = (endRow - startRow) * this.cellHeight;
+
+    this.ctx.fillStyle = COLORS.background;
+    this.ctx.fillRect(clearX, clearY, clearWidth, clearHeight);
+
+    // Draw cells within render bounds
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
         this.drawCell(this.grid[row][col], timestamp);
       }
     }

@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 
 export type Orientation = 'portrait' | 'landscape';
 
+/**
+ * Detects and tracks device orientation changes.
+ * Used to adjust UI layout responsively for mobile and tablet devices.
+ */
 export function useOrientation(): Orientation {
   const [orientation, setOrientation] = useState<Orientation>(() => {
-    if (typeof window === 'undefined') return 'landscape';
+    if (typeof window === 'undefined') {
+      return 'landscape';
+    }
+
     return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
   });
 

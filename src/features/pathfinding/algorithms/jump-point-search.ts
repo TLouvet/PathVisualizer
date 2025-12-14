@@ -1,26 +1,31 @@
-import { type GridNodeData, PathOption } from '../../types/grid-node';
-import { MinBinaryHeap } from '../data-structures/min-heap';
+import { MinBinaryHeap } from '@/core/data-structures/min-heap';
+import { PathOption, type GridNodeData } from '@/types/grid-node';
+import { PathBuilder } from './path-builder';
+import { isTargetNode } from './helpers';
+import type { Distance2DStrategy } from '@/core/distance/distance-2d.strategy';
 
 export class JumpPointSearchAlgorithm {
   private grid!: GridNodeData[][];
   private end!: GridNodeData;
   private visitedNodes!: GridNodeData[];
+  private distanceStrategy!: Distance2DStrategy;
 
   solve(
     grid: GridNodeData[][],
     start: GridNodeData,
     end: GridNodeData,
-    getDistance: (a: GridNodeData, b: GridNodeData) => number
+    distanceStrategy: Distance2DStrategy
   ): { visited: GridNodeData[]; path: GridNodeData[]; found: boolean } {
     this.grid = grid;
     this.end = end;
     this.visitedNodes = [];
+    this.distanceStrategy = distanceStrategy;
 
     const heap = new MinBinaryHeap<GridNodeData>('totalCost');
 
     // Initialize start node
     start.costFromStart = 0;
-    start.heuristicToEnd = getDistance(start, end);
+    start.heuristicToEnd = this.distanceStrategy.calculate(start, end);
     start.totalCost = start.costFromStart + start.heuristicToEnd;
     heap.insert(start);
 
@@ -33,15 +38,8 @@ export class JumpPointSearchAlgorithm {
       if (closedSet.has(currentKey)) continue;
       closedSet.add(currentKey);
 
-      if (current.row === end.row && current.col === end.col) {
-        // Build solution path
-        const path: GridNodeData[] = [];
-        let node: GridNodeData | null = current;
-        while (node) {
-          path.unshift(node);
-          node = node.parent;
-        }
-        return { visited: this.visitedNodes, path, found: true };
+      if (isTargetNode(current, end)) {
+        return { visited: this.visitedNodes, path: PathBuilder.buildPath(current), found: true };
       }
 
       this.visitedNodes.push(current);
@@ -53,12 +51,12 @@ export class JumpPointSearchAlgorithm {
         const successorKey = `${successor.row},${successor.col}`;
         if (closedSet.has(successorKey)) continue;
 
-        const distance = getDistance(current, successor);
+        const distance = this.distanceStrategy.calculate(current, successor);
         const newCost = current.costFromStart + distance;
 
         if (newCost < successor.costFromStart) {
           successor.costFromStart = newCost;
-          successor.heuristicToEnd = getDistance(successor, end);
+          successor.heuristicToEnd = this.distanceStrategy.calculate(successor, end);
           successor.totalCost = successor.costFromStart + successor.heuristicToEnd;
           successor.parent = current;
           heap.insert(successor);

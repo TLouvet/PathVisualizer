@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useGridStore } from '../../store/grid-store';
 import { PathOption } from '../../types/grid-node';
 import { usePathfindingCanvas } from '../../hooks/usePathfindingCanvas';
-import { useMazeGeneration } from '../../features/maze/hooks/useMazeGeneration';
+import { useMazeGeneration } from '../../features/maze/hooks/use-maze-generation';
 import { useCanvasGridManager } from '../../contexts/CanvasGridContext';
 import CanvasGrid from './canvas-grid-v2';
 

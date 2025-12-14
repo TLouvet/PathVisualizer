@@ -1,6 +1,4 @@
-import { type GridNodeData, PathOption } from '../../types/grid-node';
-import { ManhattanDistance } from '../distance/ManhattanDistance';
-import { EuclidianDistance } from '../distance/EuclidianDistance';
+import { PathOption, type GridNodeData } from '@/types/grid-node';
 
 export function getAdjacentNodes4Direction(grid: GridNodeData[][], current: GridNodeData): GridNodeData[] {
   const { row, col } = current;
@@ -100,13 +98,6 @@ function isValidNode(node: GridNodeData): boolean {
   );
 }
 
-const manhattanDistance = new ManhattanDistance();
-const euclidianDistance = new EuclidianDistance();
-
-export function getManhattanDistance(a: GridNodeData, b: GridNodeData): number {
-  return manhattanDistance.calculate({ row: a.row, col: a.col }, { row: b.row, col: b.col });
-}
-
-export function getEuclidianDistance(a: GridNodeData, b: GridNodeData): number {
-  return euclidianDistance.calculate({ row: a.row, col: a.col }, { row: b.row, col: b.col });
+export function isTargetNode(current: GridNodeData, target: GridNodeData): boolean {
+  return current.row === target.row && current.col === target.col;
 }

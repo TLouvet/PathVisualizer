@@ -1,5 +1,4 @@
-import { AlgorithmType, DirectionType } from '@/types/algorithm';
-import { MazeAlgorithm } from '@/features/maze/types/maze';
+import { AlgorithmType, DirectionType } from '../types/algorithm';
 
 const algorithmLabels: Record<AlgorithmType, string> = {
   [AlgorithmType.DFS]: 'DFS',
@@ -12,11 +11,6 @@ const algorithmLabels: Record<AlgorithmType, string> = {
   [AlgorithmType.JPS]: 'Jump Point Search',
 };
 
-const mazeAlgorithmLabels: Record<MazeAlgorithm, string> = {
-  [MazeAlgorithm.DFS]: 'DFS Maze',
-  [MazeAlgorithm.PRIM]: 'Prim Maze',
-};
-
 const directionLabels: Record<DirectionType, string> = {
   [DirectionType.FOUR]: '4-Way',
   [DirectionType.EIGHT]: '8-Way',
@@ -25,11 +19,6 @@ const directionLabels: Record<DirectionType, string> = {
 export const algorithmOptions = Object.values(AlgorithmType).map((value) => ({
   value,
   label: algorithmLabels[value],
-}));
-
-export const mazeAlgorithmOptions = Object.values(MazeAlgorithm).map((value) => ({
-  value,
-  label: mazeAlgorithmLabels[value],
 }));
 
 export const directionOptions = [DirectionType.FOUR, DirectionType.EIGHT].map((value) => ({

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import { useGridStore } from '@/store/grid-store';
 import { PathOption } from '@/types/grid-node';
 import { MazeAlgorithm } from '../types/maze';
 import { DFSMazeStrategy } from '../algorithms/dfs-maze.strategy';
 import { PrimMazeStrategy } from '../algorithms/prim-maze.strategy';
 import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
+import { useAbortController } from '@/shared/hooks/use-abort-controller';
 
 export function useMazeGeneration() {
   const { manager } = useCanvasGridManager();
@@ -12,7 +13,7 @@ export function useMazeGeneration() {
     useGridStore();
 
   // AbortController to cancel ongoing animations
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const { createController } = useAbortController([gridVersion]);
 
   const generateMazeAnimated = useCallback(async () => {
     if (!manager) {
@@ -20,14 +21,9 @@ export function useMazeGeneration() {
       return;
     }
 
-    // Cancel any ongoing animation
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new AbortController for this run
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
+    // Create new AbortController for this run (auto-aborts previous)
+    const controller = createController();
+    const signal = controller.signal;
 
     setIsCalculating(true);
 
@@ -109,23 +105,7 @@ export function useMazeGeneration() {
     if (startNode && endNode) {
       incrementGridVersion();
     }
-  }, [manager, gridWidth, gridHeight, selectedMazeAlgorithm, setIsCalculating, incrementGridVersion]);
-
-  // Abort ongoing animation when grid structure changes (size, reset)
-  useEffect(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-  }, [gridVersion]);
-
-  // Cancel animation when component unmounts
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
+  }, [manager, gridWidth, gridHeight, selectedMazeAlgorithm, setIsCalculating, incrementGridVersion, createController]);
 
   return { generateMazeAnimated };
 }

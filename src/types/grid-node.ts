@@ -7,7 +7,7 @@ export const PathOption = {
   SOLUTION: 'Solution',
 } as const;
 
-export type PathOption = typeof PathOption[keyof typeof PathOption];
+export type PathOption = (typeof PathOption)[keyof typeof PathOption];
 
 export interface GridNodeData {
   row: number;
@@ -18,9 +18,4 @@ export interface GridNodeData {
   costFromStart: number; // g in A*
   heuristicToEnd: number; // h in A*
   totalCost: number; // f in A* (costFromStart + heuristicToEnd)
-}
-
-export interface Point2D {
-  x: number;
-  y: number;
 }

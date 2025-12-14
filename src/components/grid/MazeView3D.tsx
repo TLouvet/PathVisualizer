@@ -96,6 +96,34 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     }
   }, [enableMouseLook]);
 
+  // Pause 2D canvas rendering when in 3D view
+  useEffect(() => {
+    if (!manager) return;
+
+    // Pause the 2D canvas render loop since we're in 3D view
+    manager.pause();
+
+    // Resume when exiting 3D view
+    return () => {
+      manager.resume();
+      // Disable culling when back in 2D view
+      manager.setRenderRadius(null);
+    };
+  }, [manager]);
+
+  // Enable viewport culling and sync player position with canvas manager
+  useEffect(() => {
+    if (!manager) return;
+
+    // Enable culling with 10 cell radius around player
+    manager.setRenderRadius(10);
+
+    // Update focal point as player moves
+    const playerCol = Math.floor(player.x);
+    const playerRow = Math.floor(player.y);
+    manager.setFocalPoint(playerRow, playerCol);
+  }, [manager, player.x, player.y]);
+
   // Check if player reached the end
   useEffect(() => {
     if (!manager?.endNode || hasWon) return;

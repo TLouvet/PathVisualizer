@@ -145,10 +145,18 @@ export class Raycaster {
   castAllRays(player: Player, screenWidth: number): RaycastResult[] {
     const rays: RaycastResult[] = [];
 
+    // Camera plane calculation for proper perspective without fisheye
+    const planeX = Math.cos(player.angle + Math.PI / 2) * Math.tan(player.fov / 2);
+    const planeY = Math.sin(player.angle + Math.PI / 2) * Math.tan(player.fov / 2);
+
     for (let x = 0; x < screenWidth; x++) {
-      // Calculate ray position and direction
-      const cameraX = (2 * x) / screenWidth - 1; // x-coordinate in camera space
-      const rayAngle = player.angle + Math.atan(cameraX * Math.tan(player.fov / 2));
+      // Calculate ray position and direction using camera plane
+      const cameraX = (2 * x) / screenWidth - 1; // x-coordinate in camera space [-1, 1]
+
+      // Direction vector based on player direction and camera plane
+      const rayDirX = Math.cos(player.angle) + planeX * cameraX;
+      const rayDirY = Math.sin(player.angle) + planeY * cameraX;
+      const rayAngle = Math.atan2(rayDirY, rayDirX);
 
       const result = this.castRay(player, rayAngle);
       rays.push(result);

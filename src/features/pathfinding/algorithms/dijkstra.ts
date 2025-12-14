@@ -1,12 +1,15 @@
-import { type GridNodeData } from '../../types/grid-node';
-import { MinBinaryHeap } from '../data-structures/min-heap';
+import { MinBinaryHeap } from '@/core/data-structures/min-heap';
+import type { GridNodeData } from '@/types/grid-node';
+import { PathBuilder } from './path-builder';
+import { isTargetNode } from './helpers';
+import type { Distance2DStrategy } from '@/core/distance/distance-2d.strategy';
 
 export class DijkstraAlgorithm {
   solve(
     start: GridNodeData,
     end: GridNodeData,
     getAdjacentNodes: (node: GridNodeData) => GridNodeData[],
-    getDistance: (a: GridNodeData, b: GridNodeData) => number
+    distanceStrategy: Distance2DStrategy
   ): { visited: GridNodeData[]; path: GridNodeData[]; found: boolean } {
     const visitedNodes: GridNodeData[] = [];
     const heap = new MinBinaryHeap<GridNodeData>('costFromStart');
@@ -18,15 +21,8 @@ export class DijkstraAlgorithm {
     while (!heap.isEmpty()) {
       const current = heap.extractMin();
 
-      if (current.row === end.row && current.col === end.col) {
-        // Build solution path
-        const path: GridNodeData[] = [];
-        let node: GridNodeData | null = current;
-        while (node) {
-          path.unshift(node);
-          node = node.parent;
-        }
-        return { visited: visitedNodes, path, found: true };
+      if (isTargetNode(current, end)) {
+        return { visited: visitedNodes, path: PathBuilder.buildPath(current), found: true };
       }
 
       visitedNodes.push(current);
@@ -34,7 +30,7 @@ export class DijkstraAlgorithm {
       const adjacentNodes = getAdjacentNodes(current);
 
       for (const node of adjacentNodes) {
-        const distance = getDistance(current, node);
+        const distance = distanceStrategy.calculate(current, node);
         const newCost = current.costFromStart + distance;
 
         if (newCost < node.costFromStart) {
