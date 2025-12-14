@@ -543,6 +543,12 @@ export class CanvasGridManager {
         const scale = 0.8 + easeOut * 0.4;
         const glowIntensity = easeOut;
 
+        // Clip glow to cell boundaries to prevent overflow
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.rect(x, y, this.cellWidth, this.cellHeight);
+        this.ctx.clip();
+
         const glowSize = 10 * glowIntensity;
         const gradient = this.ctx.createRadialGradient(
           x + this.cellWidth / 2,
@@ -557,6 +563,8 @@ export class CanvasGridManager {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(x - glowSize, y - glowSize, this.cellWidth + glowSize * 2, this.cellHeight + glowSize * 2);
 
+        this.ctx.restore();
+
         const scaledWidth = this.cellWidth * scale;
         const scaledHeight = this.cellHeight * scale;
         const offsetX = (this.cellWidth - scaledWidth) / 2;
@@ -564,9 +572,13 @@ export class CanvasGridManager {
 
         this.ctx.fillStyle = COLORS.solution;
         this.ctx.fillRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
-        this.ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
+
+        // Only draw stroke if borders are enabled
+        if (this.showBorders) {
+          this.ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+          this.ctx.lineWidth = 2;
+          this.ctx.strokeRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
+        }
         break;
       }
     }
