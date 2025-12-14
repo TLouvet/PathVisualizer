@@ -20,6 +20,8 @@ const Grid = () => {
 
   // Track if we modified the path during drawing session
   const modifiedPathDuringDraw = useRef(false);
+  // Track the last processed trigger value to avoid re-running on re-renders
+  const lastProcessedTrigger = useRef(0);
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -63,7 +65,8 @@ const Grid = () => {
 
   // Run animated maze generation when triggered
   useEffect(() => {
-    if (generateMazeAnimatedTrigger > 0) {
+    if (generateMazeAnimatedTrigger > 0 && generateMazeAnimatedTrigger !== lastProcessedTrigger.current) {
+      lastProcessedTrigger.current = generateMazeAnimatedTrigger;
       generateMazeAnimated();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

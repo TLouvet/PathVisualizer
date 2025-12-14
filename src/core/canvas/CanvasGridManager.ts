@@ -107,7 +107,6 @@ export class CanvasGridManager {
     // Calculate what cell size would be needed to fit the grid
     const cellWidthToFit = Math.floor(containerWidth / this.width);
     const cellHeightToFit = Math.floor(containerHeight / this.height);
-    console.log('cell wi', cellWidthToFit, cellHeightToFit);
     // Use preferred size, but shrink if necessary to fit container
     const size = Math.min(preferredCellSize, cellWidthToFit, cellHeightToFit, maxCellSize);
     this.cellWidth = Math.max(size, minCellSize);

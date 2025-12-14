@@ -28,6 +28,7 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [manager, setManager] = useState<CanvasGridManager | null>(null);
   const hasInitializedMaze = useRef(false);
+  const managerRef = useRef<CanvasGridManager | null>(null);
 
   const gridWidth = useGridStore((state) => state.gridWidth);
   const gridHeight = useGridStore((state) => state.gridHeight);
@@ -39,11 +40,18 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Only create manager if we don't have one already
+    if (managerRef.current) return;
+
     const newManager = new CanvasGridManagerClass(canvas, gridWidth, gridHeight);
+    managerRef.current = newManager;
     setManager(newManager);
 
     return () => {
-      newManager.destroy();
+      if (managerRef.current) {
+        managerRef.current.destroy();
+        managerRef.current = null;
+      }
       setManager(null);
     };
   }, [gridWidth, gridHeight]);
@@ -64,7 +72,8 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
         triggerAnimatedMaze();
       }, 100);
     }
-  }, [manager, triggerAnimatedMaze]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manager]);
 
   // Create context value
   const contextValue = useMemo(
