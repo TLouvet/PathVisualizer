@@ -1,16 +1,15 @@
 import { useGridStore } from '@/store/grid-store';
 import { PathOption } from '@/types/grid-node';
 import { AlgorithmType, DirectionType } from '@/features/pathfinding/types/algorithm';
-import { MazeAlgorithm } from '@/features/maze/types/maze';
 import { Button } from '@/shared/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-group';
 import { Badge } from '@/shared/components/ui/badge';
 import { Separator } from '@/shared/components/ui/separator';
 import { RotateCcw, Activity, Sparkles, Box } from 'lucide-react';
 import { CustomSelect } from './custom-select';
+import { MazeAlgorithmSelect } from './maze-algorithm-select';
 import { GridSettingsPopover } from './grid-settings-popover';
 import { algorithmOptions, directionOptions } from '@/features/pathfinding/config/algorithm-labels';
-import { mazeAlgorithmOptions } from '@/features/maze/config/algorithm-labels';
 import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
 import { useIsMobile } from '@/shared/hooks/use-is-mobile';
 
@@ -93,10 +92,9 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
           <GridSettingsPopover gridWidth={gridWidth} gridHeight={gridHeight} onGridSizeChange={setGridSize} />
 
           {/* Maze Algorithm Select */}
-          <CustomSelect
+          <MazeAlgorithmSelect
             value={selectedMazeAlgorithm}
-            onValueChange={(value) => setSelectedMazeAlgorithm(value as MazeAlgorithm)}
-            options={mazeAlgorithmOptions}
+            onValueChange={setSelectedMazeAlgorithm}
             className='w-32 h-9'
           />
 

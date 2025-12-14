@@ -45,6 +45,9 @@ export class CanvasGridManager {
 
   // Render control
   private isPaused: boolean = false;
+  private isDirty: boolean = true; // Track if render is needed
+  private isAnimating: boolean = false; // Track if animations are running
+  private lastRenderTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
@@ -56,7 +59,7 @@ export class CanvasGridManager {
 
     this.initializeGrid();
     this.setupCanvas();
-    this.startRenderLoop();
+    this.requestRender();
   }
 
   private initializeGrid() {
@@ -136,6 +139,7 @@ export class CanvasGridManager {
       this.nodeAnimations.set(key, {
         animationStartTime: performance.now(),
       });
+      this.markDirty();
     }
   }
 
@@ -174,6 +178,7 @@ export class CanvasGridManager {
     this.nodeAnimations.set(key, {
       animationStartTime: performance.now(),
     });
+    this.markDirty();
   }
 
   public clearPathVisualization() {
@@ -194,6 +199,7 @@ export class CanvasGridManager {
         }
       }
     }
+    this.markDirty();
   }
 
   public resetGrid() {
@@ -201,6 +207,7 @@ export class CanvasGridManager {
     this.nodeAnimations.clear();
     this.startNode = null;
     this.endNode = null;
+    this.markDirty();
   }
 
   public gridToScreenCoords(row: number, col: number): { x: number; y: number } {
@@ -221,10 +228,18 @@ export class CanvasGridManager {
   }
 
   public setHoveredCell(row: number | null, col: number | null) {
+    const hadHover = this.hoveredCell !== null;
+    const hasHover = row !== null && col !== null;
+
     if (row === null || col === null) {
       this.hoveredCell = null;
     } else {
       this.hoveredCell = { row, col };
+    }
+
+    // Only mark dirty if hover state changed or cell position changed
+    if (hadHover !== hasHover || hasHover) {
+      this.markDirty();
     }
   }
 
@@ -270,7 +285,49 @@ export class CanvasGridManager {
   public resume() {
     if (!this.isPaused) return;
     this.isPaused = false;
-    this.startRenderLoop();
+    this.markDirty();
+  }
+
+  /**
+   * Mark the canvas as dirty and request a render
+   */
+  private markDirty() {
+    this.isDirty = true;
+    this.requestRender();
+  }
+
+  /**
+   * Request a render if not already scheduled
+   */
+  private requestRender() {
+    if (this.animationFrame === null && !this.isPaused) {
+      this.animationFrame = requestAnimationFrame(this.render);
+    }
+  }
+
+  /**
+   * Check if any animations are currently running
+   */
+  private hasActiveAnimations(timestamp: number): boolean {
+    // Start/end nodes always animate (pulse effect)
+    if (this.startNode || this.endNode) {
+      return true;
+    }
+
+    // Check if hover is active (animated effect)
+    if (this.hoveredCell) {
+      return true;
+    }
+
+    // Check for nodes with active animations (within animation duration)
+    const ANIMATION_DURATION = 500; // ms, max animation time
+    for (const [, animState] of this.nodeAnimations) {
+      if (timestamp - animState.animationStartTime < ANIMATION_DURATION) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private drawCell(node: GridNodeData, timestamp: number) {
@@ -466,8 +523,18 @@ export class CanvasGridManager {
   }
 
   private render = (timestamp: number) => {
+    // Clear animation frame first
+    this.animationFrame = null;
+
     // Stop if paused
     if (this.isPaused) return;
+
+    // Only render if dirty or animations are active
+    const hasAnimations = this.hasActiveAnimations(timestamp);
+
+    if (!this.isDirty && !hasAnimations) {
+      return; // Nothing to render
+    }
 
     // Determine render bounds
     let startRow = 0;
@@ -504,16 +571,15 @@ export class CanvasGridManager {
       this.drawHoverEffect(this.hoveredCell.row, this.hoveredCell.col, timestamp);
     }
 
-    // Continue loop
-    this.animationFrame = requestAnimationFrame(this.render);
-  };
+    // Mark as clean after rendering
+    this.isDirty = false;
+    this.lastRenderTime = timestamp;
 
-  private startRenderLoop() {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
+    // Continue rendering if animations are still active
+    if (hasAnimations) {
+      this.animationFrame = requestAnimationFrame(this.render);
     }
-    this.animationFrame = requestAnimationFrame(this.render);
-  }
+  };
 
   public destroy() {
     if (this.animationFrame) {
