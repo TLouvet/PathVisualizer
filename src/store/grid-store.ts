@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { type GridNodeData, PathOption } from '../types/grid-node';
 import { AlgorithmType, DirectionType } from '../features/pathfinding/types/algorithm';
 import { MazeAlgorithm } from '../features/maze/types/maze';
+import { AnimationSpeed } from '../types/animation-speed';
 
 // Determine initial grid size based on device
 const getInitialGridSize = () => {
@@ -46,7 +47,7 @@ interface GridStore {
   executionTime: number;
 
   // Animation settings
-  animationSpeed: number; // milliseconds delay per step (0 = instant, higher = slower)
+  animationSpeed: AnimationSpeed;
 
   // Grid change tracking (increments when walls/start/end change, not for visited/solution)
   gridVersion: number;
@@ -62,7 +63,7 @@ interface GridStore {
   setShowCellBorders: (show: boolean) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   setExecutionTime: (time: number) => void;
-  setAnimationSpeed: (speed: number) => void;
+  setAnimationSpeed: (speed: AnimationSpeed) => void;
   generateMazeAnimatedTrigger: number; // Trigger counter for animated maze generation
   triggerAnimatedMaze: () => void;
   incrementGridVersion: () => void;
@@ -84,7 +85,7 @@ export const useGridStore = create<GridStore>((set) => ({
   showCellBorders: true,
   isCalculating: false,
   executionTime: 0,
-  animationSpeed: 30,
+  animationSpeed: AnimationSpeed.MEDIUM,
   gridVersion: 0,
   generateMazeAnimatedTrigger: 0,
 

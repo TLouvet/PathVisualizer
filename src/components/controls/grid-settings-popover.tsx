@@ -4,6 +4,8 @@ import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Label } from '@/shared/components/ui/label';
 import { Settings } from 'lucide-react';
 import { LabeledSlider } from './labeled-slider';
+import { AnimationSpeed, ANIMATION_SPEED_LABELS } from '@/types/animation-speed';
+import { CustomSelect } from './custom-select';
 
 interface GridSettingsPopoverProps {
   gridWidth: number;
@@ -13,8 +15,8 @@ interface GridSettingsPopoverProps {
   onShowVisitedNodesChange: (show: boolean) => void;
   showCellBorders: boolean;
   onShowCellBordersChange: (show: boolean) => void;
-  animationSpeed: number;
-  onAnimationSpeedChange: (speed: number) => void;
+  animationSpeed: AnimationSpeed;
+  onAnimationSpeedChange: (speed: AnimationSpeed) => void;
 }
 
 export function GridSettingsPopover({
@@ -57,15 +59,18 @@ export function GridSettingsPopover({
             />
 
             <div className='pt-2 border-t'>
-              <LabeledSlider
-                label='Animation Speed (ms)'
-                value={animationSpeed}
-                min={0}
-                max={500}
-                step={10}
-                onValueChange={onAnimationSpeedChange}
-                formatValue={(value) => (value === 0 ? 'Instant' : `${value}ms`)}
-              />
+              <div className='space-y-2'>
+                <Label className='text-sm'>Animation Speed</Label>
+                <CustomSelect
+                  value={animationSpeed}
+                  onValueChange={(value) => onAnimationSpeedChange(value as AnimationSpeed)}
+                  options={Object.values(AnimationSpeed).map((speed) => ({
+                    value: speed,
+                    label: ANIMATION_SPEED_LABELS[speed],
+                  }))}
+                  className='w-full'
+                />
+              </div>
             </div>
 
             <div className='flex items-center space-x-2 pt-2'>

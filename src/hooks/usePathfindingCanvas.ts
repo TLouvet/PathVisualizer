@@ -17,6 +17,7 @@ import { ManhattanDistance } from '../core/distance/manhattan-distance';
 import { EuclidianDistance } from '../core/distance/euclidian-distance';
 import { useAbortController } from '../shared/hooks/use-abort-controller';
 import { BidirectionalAStarAlgorithm } from '@/features/pathfinding/algorithms/bidirectional-astar';
+import { ANIMATION_SPEED_CONFIGS } from '@/types/animation-speed';
 
 export function usePathfindingCanvas() {
   const { selectedAlgorithm, selectedDirection, gridVersion, showVisitedNodes, setIsCalculating, setExecutionTime } =
@@ -45,20 +46,19 @@ export function usePathfindingCanvas() {
           if (node.state !== PathOption.START && node.state !== PathOption.END) {
             manager.updateNodeState(node.row, node.col, PathOption.VISITED);
 
-            // Read animation speed from store for real-time reactivity
-            const currentSpeed = useGridStore.getState().animationSpeed;
-            const batchSize =
-              currentSpeed === 0 ? visited.length : Math.max(1, Math.ceil(20 / Math.max(currentSpeed, 1)));
+            // Read config in loop for real-time speed changes
+            const speedPreset = useGridStore.getState().animationSpeed;
+            const config = ANIMATION_SPEED_CONFIGS[speedPreset];
 
-            // Add delay based on current animation speed
-            if (currentSpeed > 0 && i % batchSize === 0) {
-              await new Promise((resolve) => setTimeout(resolve, currentSpeed));
+            // Add delay based on batch size and speed preset
+            if (config.delay > 0 && (i + 1) % config.batchSize === 0) {
+              await new Promise((resolve) => setTimeout(resolve, config.delay));
             }
           }
         }
       }
 
-      // Animate solution path - check if bidirectional
+      // Animate solution path
       if (pathFromStart && pathFromEnd) {
         // Bidirectional: render both paths simultaneously
         const maxLength = Math.max(pathFromStart.length, pathFromEnd.length);
@@ -82,10 +82,12 @@ export function usePathfindingCanvas() {
             }
           }
 
-          // Read current speed for real-time reactivity
-          const currentSpeed = useGridStore.getState().animationSpeed;
-          if (currentSpeed > 0) {
-            await new Promise((resolve) => setTimeout(resolve, currentSpeed));
+          // Read config in loop for real-time speed changes
+          const speedPreset = useGridStore.getState().animationSpeed;
+          const pathConfig = ANIMATION_SPEED_CONFIGS[speedPreset];
+
+          if (pathConfig.delay > 0) {
+            await new Promise((resolve) => setTimeout(resolve, pathConfig.delay));
           }
         }
       } else {
@@ -97,10 +99,12 @@ export function usePathfindingCanvas() {
           if (node.state !== PathOption.START && node.state !== PathOption.END) {
             manager.updateNodeState(node.row, node.col, PathOption.SOLUTION);
 
-            // Read current speed for real-time reactivity
-            const currentSpeed = useGridStore.getState().animationSpeed;
-            if (currentSpeed > 0) {
-              await new Promise((resolve) => setTimeout(resolve, currentSpeed));
+            // Read config in loop for real-time speed changes
+            const speedPreset = useGridStore.getState().animationSpeed;
+            const pathConfig = ANIMATION_SPEED_CONFIGS[speedPreset];
+
+            if (pathConfig.delay > 0) {
+              await new Promise((resolve) => setTimeout(resolve, pathConfig.delay));
             }
           }
         }
