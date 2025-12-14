@@ -21,7 +21,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
   const gridHeight = useGridStore((state) => state.gridHeight);
   const raycasterRef = useRef<Raycaster | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const [hasWon, setHasWon] = useState(false);
+  const hasWonRef = useRef(false);
   const [isPointerLocked, setIsPointerLocked] = useState(false);
 
   // Get node function for raycaster and minimap
@@ -68,7 +68,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
   );
 
   const startPos = getStartPosition();
-  const { player, playerRef, resetPlayer, enableMouseLook, updatePlayer } = use3DPlayer({
+  const { playerRef, resetPlayer, enableMouseLook, updatePlayer } = use3DPlayer({
     initialX: startPos.x,
     initialY: startPos.y,
     initialAngle: 0,
@@ -110,36 +110,11 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     };
   }, [manager]);
 
-  // Enable viewport culling and sync player position with canvas manager
+  // Enable viewport culling once
   useEffect(() => {
     if (!manager) return;
-
-    // Enable culling with 10 cell radius around player
     manager.setRenderRadius(10);
-
-    // Update focal point as player moves
-    const playerCol = Math.floor(player.x);
-    const playerRow = Math.floor(player.y);
-    manager.setFocalPoint(playerRow, playerCol);
-  }, [manager, player.x, player.y]);
-
-  // Check if player reached the end
-  useEffect(() => {
-    if (!manager?.endNode || hasWon) return;
-
-    const endCol = manager.endNode.col;
-    const endRow = manager.endNode.row;
-    const playerCol = Math.floor(player.x);
-    const playerRow = Math.floor(player.y);
-
-    if (playerCol === endCol && playerRow === endRow) {
-      setHasWon(true);
-      setTimeout(() => {
-        alert('🎉 Congratulations! You found the exit!');
-        onExit();
-      }, 100);
-    }
-  }, [player.x, player.y, manager, onExit, hasWon]);
+  }, [manager]);
 
   // Unified render loop: update player + render canvas
   useEffect(() => {
@@ -190,6 +165,28 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
 
       // Cast rays at reduced resolution (use current player state from ref)
       const currentPlayer = playerRef.current;
+
+      // Update focal point for viewport culling
+      if (manager) {
+        const playerCol = Math.floor(currentPlayer.x);
+        const playerRow = Math.floor(currentPlayer.y);
+        manager.setFocalPoint(playerRow, playerCol);
+
+        // Check win condition
+        if (manager.endNode && !hasWonRef.current) {
+          const endCol = manager.endNode.col;
+          const endRow = manager.endNode.row;
+
+          if (playerCol === endCol && playerRow === endRow) {
+            hasWonRef.current = true;
+            setTimeout(() => {
+              alert('🎉 Congratulations! You found the exit!');
+              onExit();
+            }, 100);
+          }
+        }
+      }
+
       const rays = raycaster.castAllRays(currentPlayer, renderWidth);
 
       // Draw walls with scaling
