@@ -4,6 +4,7 @@ import { GreedyDFSAlgorithm } from '../algorithms/greedy-dfs';
 import { BFSAlgorithm } from '../algorithms/bfs';
 import { GreedyBestFirstAlgorithm } from '../algorithms/greedy-best-first';
 import { BidirectionalSearchAlgorithm } from '../algorithms/bidirectional-search';
+import { BidirectionalAStarAlgorithm } from '../algorithms/bidirectional-astar';
 import { DijkstraAlgorithm } from '../algorithms/dijkstra';
 import { AStarAlgorithm } from '../algorithms/astar';
 import { JumpPointSearchAlgorithm } from '../algorithms/jump-point-search';
@@ -14,6 +15,7 @@ type Algorithm =
   | BFSAlgorithm
   | GreedyBestFirstAlgorithm
   | BidirectionalSearchAlgorithm
+  | BidirectionalAStarAlgorithm
   | DijkstraAlgorithm
   | AStarAlgorithm
   | JumpPointSearchAlgorithm;
@@ -25,6 +27,7 @@ export class AlgorithmFactory {
     [AlgorithmType.BFS]: () => new BFSAlgorithm(),
     [AlgorithmType.GREEDY_BFS]: () => new GreedyBestFirstAlgorithm(),
     [AlgorithmType.BIDIRECTIONAL]: () => new BidirectionalSearchAlgorithm(),
+    [AlgorithmType.BIDIRECTIONAL_ASTAR]: () => new BidirectionalAStarAlgorithm(),
     [AlgorithmType.DIJKSTRA]: () => new DijkstraAlgorithm(),
     [AlgorithmType.ASTAR]: () => new AStarAlgorithm(),
     [AlgorithmType.JPS]: () => new JumpPointSearchAlgorithm(),

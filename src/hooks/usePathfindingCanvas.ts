@@ -16,6 +16,7 @@ import { useCanvasGridManager } from '../contexts/CanvasGridContext';
 import { ManhattanDistance } from '../core/distance/manhattan-distance';
 import { EuclidianDistance } from '../core/distance/euclidian-distance';
 import { useAbortController } from '../shared/hooks/use-abort-controller';
+import { BidirectionalAStarAlgorithm } from '@/features/pathfinding/algorithms/bidirectional-astar';
 
 export function usePathfindingCanvas() {
   const { selectedAlgorithm, selectedDirection, gridVersion, showVisitedNodes, setIsCalculating, setExecutionTime } =
@@ -192,6 +193,12 @@ export function usePathfindingCanvas() {
       case AlgorithmType.JPS: {
         const jps = new JumpPointSearchAlgorithm();
         result = jps.solve(grid, start, end, distanceStrategy);
+        break;
+      }
+
+      case AlgorithmType.BIDIRECTIONAL_ASTAR: {
+        const biDirAStart = new BidirectionalAStarAlgorithm();
+        result = biDirAStart.solve(start, end, getAdjacentNodes, distanceStrategy.calculate);
         break;
       }
 

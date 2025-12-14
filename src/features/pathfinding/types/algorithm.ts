@@ -6,6 +6,7 @@ export const AlgorithmType = {
   BFS: 'bfs',
   GREEDY_BFS: 'greedy-bfs',
   BIDIRECTIONAL: 'bidirectional',
+  BIDIRECTIONAL_ASTAR: 'bidirectional-astar',
   DIJKSTRA: 'dijkstra',
   ASTAR: 'astar',
   JPS: 'jps',

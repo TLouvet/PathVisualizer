@@ -6,6 +6,7 @@ const algorithmLabels: Record<AlgorithmType, string> = {
   [AlgorithmType.BFS]: 'BFS',
   [AlgorithmType.GREEDY_BFS]: 'Greedy Best-First',
   [AlgorithmType.BIDIRECTIONAL]: 'Bidirectional BFS',
+  [AlgorithmType.BIDIRECTIONAL_ASTAR]: 'Bidirectional A*',
   [AlgorithmType.DIJKSTRA]: 'Dijkstra',
   [AlgorithmType.ASTAR]: 'A*',
   [AlgorithmType.JPS]: 'Jump Point Search',
