@@ -23,6 +23,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
   const animationFrameRef = useRef<number | null>(null);
   const hasWonRef = useRef(false);
   const [isPointerLocked, setIsPointerLocked] = useState(false);
+  const [minimapInvalidationKey, setMinimapInvalidationKey] = useState(0);
 
   // Get node function for raycaster and minimap
   const getNode = useCallback((row: number, col: number) => manager?.getNode(row, col) ?? null, [manager]);
@@ -32,6 +33,7 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     gridWidth,
     gridHeight,
     getNode,
+    invalidationKey: minimapInvalidationKey,
   });
 
   // Controls panel
@@ -88,12 +90,50 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
     };
   }, []);
 
-  // Enable pointer lock on canvas click
+  // Handle wall carving
+  const carveWall = useCallback(() => {
+    if (!raycasterRef.current || !manager) return;
+
+    const player = playerRef.current;
+    const raycaster = raycasterRef.current;
+
+    // Cast a ray straight ahead from the center of the screen
+    const rayResult = raycaster.castRay(player, player.angle);
+
+    // Only carve if we hit a wall within reasonable distance
+    const MAX_CARVE_DISTANCE = 3;
+    if (rayResult.distance > MAX_CARVE_DISTANCE) return;
+    if (rayResult.wallType !== PathOption.WALL) return;
+
+    // Calculate the grid position of the wall
+    const hitCol = Math.floor(rayResult.hitX);
+    const hitRow = Math.floor(rayResult.hitY);
+
+    // Check if it's a boundary wall (don't allow carving boundary walls)
+    const isBoundary =
+      hitCol === 0 || hitCol === gridWidth - 1 || hitRow === 0 || hitRow === gridHeight - 1;
+
+    if (isBoundary) return;
+
+    // Carve the wall (set it to empty/walkable)
+    manager.updateNodeState(hitRow, hitCol, PathOption.NONE);
+
+    // Invalidate minimap cache to force re-render
+    setMinimapInvalidationKey((prev) => prev + 1);
+  }, [manager, gridWidth, gridHeight]);
+
+  // Enable pointer lock on canvas click, or carve wall if already locked
   const handleCanvasClick = useCallback(() => {
     if (canvasRef.current) {
-      enableMouseLook(canvasRef.current);
+      if (isPointerLocked) {
+        // Pointer is locked, carve the wall
+        carveWall();
+      } else {
+        // Pointer is not locked, enable mouse look
+        enableMouseLook(canvasRef.current);
+      }
     }
-  }, [enableMouseLook]);
+  }, [enableMouseLook, isPointerLocked, carveWall]);
 
   // Pause 2D canvas rendering when in 3D view
   useEffect(() => {
@@ -228,6 +268,29 @@ export function MazeView3D({ onExit }: MazeView3DProps) {
 
       // Draw controls
       drawControlsPanel(ctx, height);
+
+      // Draw crosshair in the center of the screen
+      if (isPointerLocked) {
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const crosshairSize = 10;
+        const crosshairThickness = 2;
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = crosshairThickness;
+
+        // Horizontal line
+        ctx.beginPath();
+        ctx.moveTo(centerX - crosshairSize, centerY);
+        ctx.lineTo(centerX + crosshairSize, centerY);
+        ctx.stroke();
+
+        // Vertical line
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY - crosshairSize);
+        ctx.lineTo(centerX, centerY + crosshairSize);
+        ctx.stroke();
+      }
 
       animationFrameRef.current = requestAnimationFrame(render);
     };

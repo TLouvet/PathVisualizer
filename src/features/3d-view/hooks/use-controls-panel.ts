@@ -21,6 +21,7 @@ const DEFAULT_CONTROLS: ControlItem[] = [
   { label: 'Move Backward', keys: 'S/↓' },
   { label: 'Strafe Left', keys: 'Q/A' },
   { label: 'Strafe Right', keys: 'D' },
+  { label: 'Carve Wall', keys: 'Click' },
 ];
 
 const LINE_HEIGHT = 20;

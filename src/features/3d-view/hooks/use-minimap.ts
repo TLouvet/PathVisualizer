@@ -7,6 +7,7 @@ interface UseMinimapOptions {
   gridHeight: number;
   getNode: (row: number, col: number) => GridNodeData | null;
   maxSize?: number;
+  invalidationKey?: number; // Optional key to force cache invalidation
 }
 
 /**
@@ -14,7 +15,7 @@ interface UseMinimapOptions {
  * Pre-renders the grid and provides a function to draw the player overlay
  */
 export function useMinimap(options: UseMinimapOptions) {
-  const { gridWidth, gridHeight, getNode, maxSize = 150 } = options;
+  const { gridWidth, gridHeight, getNode, maxSize = 150, invalidationKey = 0 } = options;
   const minimapCacheRef = useRef<HTMLCanvasElement | null>(null);
 
   // Pre-render minimap (only once when grid changes)
@@ -71,7 +72,7 @@ export function useMinimap(options: UseMinimapOptions) {
     }
 
     minimapCacheRef.current = cache;
-  }, [gridWidth, gridHeight, getNode, maxSize]);
+  }, [gridWidth, gridHeight, getNode, maxSize, invalidationKey]);
 
   // Function to draw the minimap with player overlay
   const drawMinimap = useCallback(
