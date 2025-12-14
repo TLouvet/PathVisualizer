@@ -18,11 +18,11 @@ function App() {
     <CanvasGridProvider>
       {showLandscapePrompt && <LandscapePrompt />}
       <Activity mode={show3DView ? 'hidden' : 'visible'}>
-        <div className='min-h-screen bg-background flex flex-col'>
+        <div className='h-screen bg-background flex flex-col'>
           <Header />
           <Toolbar onShow3DView={() => setShow3DView(true)} />
           <div className='flex-1 p-4 md:p-8 overflow-hidden'>
-            <div className='max-w-7xl mx-auto h-full'>
+            <div className='w-full h-full'>
               <Grid />
             </div>
           </div>

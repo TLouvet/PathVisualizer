@@ -18,7 +18,8 @@ import { EuclidianDistance } from '../core/distance/euclidian-distance';
 import { useAbortController } from '../shared/hooks/use-abort-controller';
 
 export function usePathfindingCanvas() {
-  const { selectedAlgorithm, selectedDirection, gridVersion, setIsCalculating, setExecutionTime } = useGridStore();
+  const { selectedAlgorithm, selectedDirection, gridVersion, showVisitedNodes, setIsCalculating, setExecutionTime } =
+    useGridStore();
   const { manager } = useCanvasGridManager();
 
   // AbortController to cancel ongoing animations
@@ -31,22 +32,25 @@ export function usePathfindingCanvas() {
       signal: AbortSignal,
       gridSize: number,
       manager: CanvasGridManager,
+      shouldShowVisited: boolean,
       pathFromStart?: GridNodeData[],
       pathFromEnd?: GridNodeData[]
     ) => {
-      const THROTTLE_INTERVAL = gridSize > 800 ? 20 : 10; // Update animation every N nodes
+      const THROTTLE_INTERVAL = 10 + Math.floor(gridSize / 100); // Update animation every N nodes
 
-      // Animate visited nodes
-      for (let i = 0; i < visited.length; i++) {
-        if (signal.aborted) return;
+      // Animate visited nodes only if enabled
+      if (shouldShowVisited) {
+        for (let i = 0; i < visited.length; i++) {
+          if (signal.aborted) return;
 
-        const node = visited[i];
-        if (node.state !== PathOption.START && node.state !== PathOption.END) {
-          manager.updateNodeState(node.row, node.col, PathOption.VISITED);
+          const node = visited[i];
+          if (node.state !== PathOption.START && node.state !== PathOption.END) {
+            manager.updateNodeState(node.row, node.col, PathOption.VISITED);
 
-          // Throttle animation for visual effect
-          if (i % THROTTLE_INTERVAL === 0) {
-            await new Promise((resolve) => requestAnimationFrame(resolve));
+            // Throttle animation for visual effect
+            if (i % THROTTLE_INTERVAL === 0) {
+              await new Promise((resolve) => requestAnimationFrame(resolve));
+            }
           }
         }
       }
@@ -90,7 +94,7 @@ export function usePathfindingCanvas() {
         }
       }
     },
-    []
+    [showVisitedNodes]
   );
 
   const runAlgorithm = useCallback(async () => {
@@ -205,6 +209,7 @@ export function usePathfindingCanvas() {
       signal,
       gridSize,
       manager,
+      showVisitedNodes,
       result.pathFromStart,
       result.pathFromEnd
     );

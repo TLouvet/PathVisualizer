@@ -15,6 +15,10 @@ const mazeAlgorithmLabels: Record<MazeAlgorithm, { label: string; description: s
     label: 'Prim Maze',
     description: 'Generates complex mazes with many branching paths',
   },
+  [MazeAlgorithm.CELLULAR_AUTOMATA]: {
+    label: 'Cellular Automata',
+    description: 'Creates organic, cave-like structures with natural-looking passages',
+  },
 };
 
 export const mazeAlgorithmOptions: MazeAlgorithmOption[] = Object.values(MazeAlgorithm).map((value) => ({

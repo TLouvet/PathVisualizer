@@ -4,6 +4,7 @@ import { PathOption } from '@/types/grid-node';
 import { MazeAlgorithm } from '../types/maze';
 import { DFSMazeStrategy } from '../algorithms/dfs-maze.strategy';
 import { PrimMazeStrategy } from '../algorithms/prim-maze.strategy';
+import { CellularAutomataMazeStrategy } from '../algorithms/cellular-automata-maze.strategy';
 import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
 import { useAbortController } from '@/shared/hooks/use-abort-controller';
 
@@ -17,11 +18,9 @@ export function useMazeGeneration() {
 
   const generateMazeAnimated = useCallback(async () => {
     if (!manager) {
-      console.log('Grid manager not initialized');
       return;
     }
 
-    // Create new AbortController for this run (auto-aborts previous)
     const controller = createController();
     const signal = controller.signal;
 
@@ -57,7 +56,14 @@ export function useMazeGeneration() {
     }
 
     // Select the appropriate maze generator strategy
-    const strategy = selectedMazeAlgorithm === MazeAlgorithm.PRIM ? new PrimMazeStrategy() : new DFSMazeStrategy();
+    let strategy;
+    if (selectedMazeAlgorithm === MazeAlgorithm.PRIM) {
+      strategy = new PrimMazeStrategy();
+    } else if (selectedMazeAlgorithm === MazeAlgorithm.CELLULAR_AUTOMATA) {
+      strategy = new CellularAutomataMazeStrategy();
+    } else {
+      strategy = new DFSMazeStrategy();
+    }
 
     // Generate maze for the entire grid (no forced border walls)
     const generator = strategy.execute({

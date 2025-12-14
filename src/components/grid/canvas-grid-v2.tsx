@@ -55,7 +55,7 @@ const CanvasGridV2 = ({ onCellClick, onCellMouseEnter, onCellMouseDown }: Canvas
   }, [manager]);
 
   return (
-    <div ref={containerRef} className='w-full h-full overflow-auto flex items-center justify-center'>
+    <div ref={containerRef} className='w-full h-full flex items-center justify-center'>
       <canvas
         ref={canvasRef}
         onClick={handleClick}

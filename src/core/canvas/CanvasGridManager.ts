@@ -34,6 +34,7 @@ export class CanvasGridManager {
   private animationFrame: number | null = null;
   private nodeAnimations = new Map<string, NodeAnimationState>();
   private hoveredCell: { row: number; col: number } | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   // Node references
   public startNode: GridNodeData | null = null;
@@ -46,8 +47,8 @@ export class CanvasGridManager {
   // Render control
   private isPaused: boolean = false;
   private isDirty: boolean = true; // Track if render is needed
-  private isAnimating: boolean = false; // Track if animations are running
-  private lastRenderTime: number = 0;
+  // private isAnimating: boolean = false; // Track if animations are running
+  // private lastRenderTime: number = 0;
 
   constructor(canvas: HTMLCanvasElement, width: number, height: number) {
     this.canvas = canvas;
@@ -59,7 +60,19 @@ export class CanvasGridManager {
 
     this.initializeGrid();
     this.setupCanvas();
+    this.setupResizeObserver();
     this.requestRender();
+  }
+
+  private setupResizeObserver() {
+    if (!this.canvas.parentElement) return;
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.setupCanvas();
+      this.markDirty();
+    });
+
+    this.resizeObserver.observe(this.canvas.parentElement);
   }
 
   private initializeGrid() {
@@ -85,12 +98,19 @@ export class CanvasGridManager {
     const containerWidth = this.canvas.parentElement?.clientWidth || 800;
     const containerHeight = this.canvas.parentElement?.clientHeight || 600;
 
-    const cellWidth = Math.floor(containerWidth / this.width);
-    const cellHeight = Math.floor(containerHeight / this.height);
+    // Preferred cell size
+    const preferredCellSize = 20;
+    const maxCellSize = 60;
+    const minCellSize = 5;
 
-    const size = Math.min(cellWidth, cellHeight, 60);
-    this.cellWidth = Math.max(size, 20);
-    this.cellHeight = Math.max(size, 20);
+    // Calculate what cell size would be needed to fit the grid
+    const cellWidthToFit = Math.floor(containerWidth / this.width);
+    const cellHeightToFit = Math.floor(containerHeight / this.height);
+    console.log('cell wi', cellWidthToFit, cellHeightToFit);
+    // Use preferred size, but shrink if necessary to fit container
+    const size = Math.min(preferredCellSize, cellWidthToFit, cellHeightToFit, maxCellSize);
+    this.cellWidth = Math.max(size, minCellSize);
+    this.cellHeight = Math.max(size, minCellSize);
 
     const canvasWidth = this.width * this.cellWidth;
     const canvasHeight = this.height * this.cellHeight;
@@ -573,7 +593,7 @@ export class CanvasGridManager {
 
     // Mark as clean after rendering
     this.isDirty = false;
-    this.lastRenderTime = timestamp;
+    // this.lastRenderTime = timestamp;
 
     // Continue rendering if animations are still active
     if (hasAnimations) {
@@ -584,6 +604,10 @@ export class CanvasGridManager {
   public destroy() {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
     }
   }
 }

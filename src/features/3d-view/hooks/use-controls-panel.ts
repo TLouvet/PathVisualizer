@@ -23,6 +23,11 @@ const DEFAULT_CONTROLS: ControlItem[] = [
   { label: 'Strafe Right', keys: 'D' },
 ];
 
+const LINE_HEIGHT = 20;
+const PADDING = 10;
+const TITLE_HEIGHT = 25;
+const PANEL_WIDTH = 280;
+
 /**
  * Hook to manage controls panel rendering for the 3D view
  */
@@ -36,26 +41,23 @@ export function useControlsPanel(options: UseControlsPanelOptions = {}) {
 
   const drawControlsPanel = useCallback(
     (ctx: CanvasRenderingContext2D, screenHeight: number, x: number = 10) => {
-      const lineHeight = 20;
-      const padding = 10;
-      const titleHeight = 25;
-      const panelHeight = titleHeight + controls.length * lineHeight + padding;
-      const panelWidth = 280;
-      const y = screenHeight - panelHeight - padding;
+      const panelHeight = TITLE_HEIGHT + controls.length * LINE_HEIGHT + PADDING;
+
+      const y = screenHeight - panelHeight - PADDING;
 
       // Draw background
       ctx.fillStyle = backgroundColor;
-      ctx.fillRect(x, y, panelWidth, panelHeight);
+      ctx.fillRect(x, y, PANEL_WIDTH, panelHeight);
 
       // Draw title
       ctx.fillStyle = textColor;
       ctx.font = font;
-      ctx.fillText('Controls:', x + padding, y + titleHeight);
+      ctx.fillText('Controls:', x + PADDING, y + TITLE_HEIGHT);
 
       // Draw control items
       controls.forEach((control, index) => {
-        const itemY = y + titleHeight + (index + 1) * lineHeight;
-        ctx.fillText(`${control.keys}: ${control.label}`, x + padding, itemY);
+        const itemY = y + TITLE_HEIGHT + (index + 1) * LINE_HEIGHT;
+        ctx.fillText(`${control.keys}: ${control.label}`, x + PADDING, itemY);
       });
     },
     [controls, backgroundColor, textColor, font]

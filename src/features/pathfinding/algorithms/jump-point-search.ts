@@ -8,6 +8,7 @@ export class JumpPointSearchAlgorithm {
   private grid!: GridNodeData[][];
   private end!: GridNodeData;
   private visitedNodes!: GridNodeData[];
+  private visitedSet!: Set<string>;
   private distanceStrategy!: Distance2DStrategy;
 
   solve(
@@ -19,6 +20,7 @@ export class JumpPointSearchAlgorithm {
     this.grid = grid;
     this.end = end;
     this.visitedNodes = [];
+    this.visitedSet = new Set<string>();
     this.distanceStrategy = distanceStrategy;
 
     const heap = new MinBinaryHeap<GridNodeData>('totalCost');
@@ -141,9 +143,10 @@ export class JumpPointSearchAlgorithm {
     if (!this.isWalkable(row, col)) return null;
 
     // Track this node as visited for visualization
-    const currentNode = this.grid[row][col];
-    if (!this.visitedNodes.some((v) => v.row === row && v.col === col)) {
-      this.visitedNodes.push(currentNode);
+    const nodeKey = `${row},${col}`;
+    if (!this.visitedSet.has(nodeKey)) {
+      this.visitedSet.add(nodeKey);
+      this.visitedNodes.push(this.grid[row][col]);
     }
 
     // Reached the goal

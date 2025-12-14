@@ -74,7 +74,7 @@ export const useGridStore = create<GridStore>((set) => ({
   selectedMazeAlgorithm: MazeAlgorithm.DFS,
   currentTool: PathOption.NONE,
   isDrawing: false,
-  showVisitedNodes: false,
+  showVisitedNodes: true,
   isCalculating: false,
   executionTime: 0,
   gridVersion: 0,
