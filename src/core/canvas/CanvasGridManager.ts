@@ -35,6 +35,7 @@ export class CanvasGridManager {
   private nodeAnimations = new Map<string, NodeAnimationState>();
   private hoveredCell: { row: number; col: number } | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private showBorders: boolean = true;
 
   // Node references
   public startNode: GridNodeData | null = null;
@@ -317,6 +318,16 @@ export class CanvasGridManager {
   }
 
   /**
+   * Set whether to show cell borders
+   */
+  public setShowBorders(show: boolean) {
+    if (this.showBorders !== show) {
+      this.showBorders = show;
+      this.markDirty();
+    }
+  }
+
+  /**
    * Pause the render loop (e.g., when canvas is hidden)
    */
   public pause() {
@@ -392,10 +403,17 @@ export class CanvasGridManager {
     switch (node.state) {
       case PathOption.NONE: {
         this.ctx.fillStyle = COLORS.empty;
-        this.ctx.fillRect(x + 1, y + 1, this.cellWidth - 2, this.cellHeight - 2);
-        this.ctx.strokeStyle = COLORS.emptyBorder;
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + 0.5, y + 0.5, this.cellWidth - 1, this.cellHeight - 1);
+
+        if (this.showBorders) {
+          // Draw with border padding
+          this.ctx.fillRect(x + 1, y + 1, this.cellWidth - 2, this.cellHeight - 2);
+          this.ctx.strokeStyle = COLORS.emptyBorder;
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(x + 0.5, y + 0.5, this.cellWidth - 1, this.cellHeight - 1);
+        } else {
+          // Fill entire cell without borders for seamless look
+          this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight);
+        }
         break;
       }
 
@@ -473,9 +491,12 @@ export class CanvasGridManager {
 
         this.ctx.fillStyle = COLORS.wall;
         this.ctx.fillRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
-        this.ctx.strokeStyle = COLORS.wallBorder;
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
+
+        if (this.showBorders) {
+          this.ctx.strokeStyle = COLORS.wallBorder;
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(x + offsetX, y + offsetY, scaledWidth, scaledHeight);
+        }
         break;
       }
 
@@ -502,11 +523,17 @@ export class CanvasGridManager {
         const alpha = 0.15 + easeOut * 0.25;
         this.ctx.fillStyle = COLORS.visited;
         this.ctx.globalAlpha = alpha;
-        this.ctx.fillRect(x + 1, y + 1, this.cellWidth - 2, this.cellHeight - 2);
-        this.ctx.globalAlpha = 1;
-        this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(x + 0.5, y + 0.5, this.cellWidth - 1, this.cellHeight - 1);
+
+        if (this.showBorders) {
+          this.ctx.fillRect(x + 1, y + 1, this.cellWidth - 2, this.cellHeight - 2);
+          this.ctx.globalAlpha = 1;
+          this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+          this.ctx.lineWidth = 1;
+          this.ctx.strokeRect(x + 0.5, y + 0.5, this.cellWidth - 1, this.cellHeight - 1);
+        } else {
+          this.ctx.fillRect(x, y, this.cellWidth, this.cellHeight);
+          this.ctx.globalAlpha = 1;
+        }
         break;
       }
 

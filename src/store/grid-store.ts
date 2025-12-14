@@ -39,6 +39,7 @@ interface GridStore {
   currentTool: PathOption;
   isDrawing: boolean;
   showVisitedNodes: boolean;
+  showCellBorders: boolean;
 
   // Algorithm execution
   isCalculating: boolean;
@@ -55,6 +56,7 @@ interface GridStore {
   setCurrentTool: (tool: PathOption) => void;
   setIsDrawing: (isDrawing: boolean) => void;
   setShowVisitedNodes: (show: boolean) => void;
+  setShowCellBorders: (show: boolean) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   setExecutionTime: (time: number) => void;
   generateMazeAnimatedTrigger: number; // Trigger counter for animated maze generation
@@ -75,6 +77,7 @@ export const useGridStore = create<GridStore>((set) => ({
   currentTool: PathOption.NONE,
   isDrawing: false,
   showVisitedNodes: true,
+  showCellBorders: true,
   isCalculating: false,
   executionTime: 0,
   gridVersion: 0,
@@ -96,6 +99,7 @@ export const useGridStore = create<GridStore>((set) => ({
   setCurrentTool: (tool) => set({ currentTool: tool }),
   setIsDrawing: (isDrawing) => set({ isDrawing }),
   setShowVisitedNodes: (show) => set({ showVisitedNodes: show }),
+  setShowCellBorders: (show) => set({ showCellBorders: show }),
   setIsCalculating: (isCalculating) => set({ isCalculating }),
   setExecutionTime: (time) => set({ executionTime: time }),
 

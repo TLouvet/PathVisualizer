@@ -5,6 +5,7 @@ import { MazeAlgorithm } from '../types/maze';
 import { DFSMazeStrategy } from '../algorithms/dfs-maze.strategy';
 import { PrimMazeStrategy } from '../algorithms/prim-maze.strategy';
 import { CellularAutomataMazeStrategy } from '../algorithms/cellular-automata-maze.strategy';
+import { BSPMazeStrategy } from '../algorithms/bsp-maze.strategy';
 import { useCanvasGridManager } from '@/contexts/CanvasGridContext';
 import { useAbortController } from '@/shared/hooks/use-abort-controller';
 
@@ -61,6 +62,8 @@ export function useMazeGeneration() {
       strategy = new PrimMazeStrategy();
     } else if (selectedMazeAlgorithm === MazeAlgorithm.CELLULAR_AUTOMATA) {
       strategy = new CellularAutomataMazeStrategy();
+    } else if (selectedMazeAlgorithm === MazeAlgorithm.BSP) {
+      strategy = new BSPMazeStrategy();
     } else {
       strategy = new DFSMazeStrategy();
     }

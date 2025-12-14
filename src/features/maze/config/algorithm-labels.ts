@@ -19,6 +19,10 @@ const mazeAlgorithmLabels: Record<MazeAlgorithm, { label: string; description: s
     label: 'Cellular Automata',
     description: 'Creates organic, cave-like structures with natural-looking passages',
   },
+  [MazeAlgorithm.BSP]: {
+    label: 'BSP Dungeon',
+    description: 'Creates rectangular rooms connected by corridors, roguelike-style',
+  },
 };
 
 export const mazeAlgorithmOptions: MazeAlgorithmOption[] = Object.values(MazeAlgorithm).map((value) => ({

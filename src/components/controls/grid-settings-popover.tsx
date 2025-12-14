@@ -11,6 +11,8 @@ interface GridSettingsPopoverProps {
   onGridSizeChange: (width: number, height: number) => void;
   showVisitedNodes: boolean;
   onShowVisitedNodesChange: (show: boolean) => void;
+  showCellBorders: boolean;
+  onShowCellBordersChange: (show: boolean) => void;
 }
 
 export function GridSettingsPopover({
@@ -19,6 +21,8 @@ export function GridSettingsPopover({
   onGridSizeChange,
   showVisitedNodes,
   onShowVisitedNodesChange,
+  showCellBorders,
+  onShowCellBordersChange,
 }: GridSettingsPopoverProps) {
   return (
     <Popover>
@@ -52,6 +56,13 @@ export function GridSettingsPopover({
               <Checkbox id='show-visited' checked={showVisitedNodes} onCheckedChange={onShowVisitedNodesChange} />
               <Label htmlFor='show-visited' className='text-sm font-normal cursor-pointer select-none'>
                 Show visited nodes
+              </Label>
+            </div>
+
+            <div className='flex items-center space-x-2'>
+              <Checkbox id='show-borders' checked={showCellBorders} onCheckedChange={onShowCellBordersChange} />
+              <Label htmlFor='show-borders' className='text-sm font-normal cursor-pointer select-none'>
+                Show cell borders
               </Label>
             </div>
           </div>

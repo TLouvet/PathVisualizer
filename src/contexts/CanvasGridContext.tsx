@@ -31,6 +31,7 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
 
   const gridWidth = useGridStore((state) => state.gridWidth);
   const gridHeight = useGridStore((state) => state.gridHeight);
+  const showCellBorders = useGridStore((state) => state.showCellBorders);
   const triggerAnimatedMaze = useGridStore((state) => state.triggerAnimatedMaze);
 
   // Initialize canvas grid manager
@@ -46,6 +47,13 @@ export const CanvasGridProvider = ({ children }: CanvasGridProviderProps) => {
       setManager(null);
     };
   }, [gridWidth, gridHeight]);
+
+  // Update showBorders setting when it changes
+  useEffect(() => {
+    if (manager) {
+      manager.setShowBorders(showCellBorders);
+    }
+  }, [manager, showCellBorders]);
 
   // Generate initial DFS maze on first load
   useEffect(() => {

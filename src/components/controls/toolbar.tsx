@@ -33,6 +33,8 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
     setGridSize,
     showVisitedNodes,
     setShowVisitedNodes,
+    showCellBorders,
+    setShowCellBorders,
     triggerAnimatedMaze,
     executionTime,
     isCalculating,
@@ -83,6 +85,8 @@ export function Toolbar({ onShow3DView }: ToolbarProps) {
               onGridSizeChange={setGridSize}
               showVisitedNodes={showVisitedNodes}
               onShowVisitedNodesChange={setShowVisitedNodes}
+              showCellBorders={showCellBorders}
+              onShowCellBordersChange={setShowCellBorders}
             />
 
             {/* Drawing Tools */}
